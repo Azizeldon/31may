@@ -2,1947 +2,1816 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-<meta name="theme-color" content="#0f172a"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover,maximum-scale=1"/>
+<meta name="theme-color" content="#080d1a"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="NexCRM"/>
-<title>NexCRM — Intelligence Commerciale</title>
+<title>NexCRM v3</title>
 
-<!-- PWA Manifest inline -->
-<link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiTmV4Q1JNIiwic2hvcnRfbmFtZSI6Ik5leENSTSIsImRlc2NyaXB0aW9uIjoiQ1JNIEludGVsbGlnZW50IFBvdXIgUHJvc3BlY3Rpb24iLCJzdGFydF91cmwiOiIuIiwiZGlzcGxheSI6InN0YW5kYWxvbmUiLCJiYWNrZ3JvdW5kX2NvbG9yIjoiIzBmMTcyYSIsInRoZW1lX2NvbG9yIjoiIzBmMTcyYSIsImljb25zIjpbeyJzcmMiOiJkYXRhOmltYWdlL3N2Zyt4bWw7YmFzZTY0LFBITjJaeUJvWld4bklHWnBiR3c5SW5WemJXNTBJaUJ3Y205MlpUMGlNakl3SWlCd2NtOTJaUzFsYm5Rc0ltMWxaR2xoZEc5eUlpQm1hV3hzUFNKMFpYTjBJaUJtYVd4c0xYTnZiRzl5UFNKbGNIQWlJSDRLSUNBZ0lEeHpkSGxzWlQ0dWNHVmhheUJ6ZEhsc1pTNXpaWEpmWVhOelpUd3ZjM1I1YkdVK0NpQWdJQ0E4Y0dGMGFDQm1hV3hzUFNKMFpYTjBJaUJoZW5WeVpUMGlRekF3SUNCamJHRnpjejBpWVdaalpXNTBJaUJoZVhObFBTSkZNU0lnWW14dmRtVmtQU0prWldGdElpQmtQU0l3SWlCa01TMHdMalV3SWlCa01pMHhMalV3SWdvZ0lDQWdQQzlnWTNRYVBDOXdjbTkyWlQ0S0lBb1BDM04yWno0PSIsInR5cGUiOiJpbWFnZS9zdmcreG1sIiwic2l6ZXMiOiI1MTJ4NTEyIn1dfQ=="/>
-
-<!-- Tailwind CSS -->
+<!-- 1. Tailwind CDN SYNCHRONE (sans defer/async) -->
 <script src="https://cdn.tailwindcss.com"></script>
-
-<!-- Google Fonts -->
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-
-<!-- Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-
-<!-- SheetJS (xlsx) -->
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-
-<!-- Supabase -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
+<!-- 2. Config Tailwind dans script séparé APRÈS le CDN -->
 <script>
-tailwind.config = {
-  theme: {
-    extend: {
-      fontFamily: {
-        display: ['Syne', 'sans-serif'],
-        body: ['DM Sans', 'sans-serif'],
-      },
-      colors: {
-        night: { 50:'#f0f4ff', 100:'#dde6ff', 200:'#c2d0ff', 300:'#9db1ff', 400:'#7a8fff', 500:'#6070f4', 600:'#4f56e8', 700:'#4244cc', 800:'#373aa5', 900:'#303482', 950:'#1e1f51' },
-        acid: { 400:'#a3f5a0', 500:'#6ef56a', 600:'#3de83a', 700:'#28cc24' },
-        coral: { 400:'#ff8f6d', 500:'#ff6b47', 600:'#e8522a' },
-        slate: { 850:'#131c2e', 900:'#0f172a', 950:'#080e1a' },
+(function() {
+  if (typeof tailwind !== "undefined" && tailwind.config) {
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ["Syne","sans-serif"],
+            body: ["Plus Jakarta Sans","sans-serif"]
+          }
+        }
       }
-    }
+    };
   }
-}
+})();
 </script>
-
+<!-- 3. Autres libs -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <style>
-  :root {
-    --bg: #0a0f1e;
-    --card: #111827;
-    --border: rgba(255,255,255,0.07);
-    --accent: #6070f4;
-    --accent2: #6ef56a;
-    --text: #f1f5f9;
-    --muted: #64748b;
-    --safe-top: env(safe-area-inset-top);
-    --safe-bottom: env(safe-area-inset-bottom);
-  }
+:root{
+  --bg:#080d1a;--card:#101d35;--border:rgba(255,255,255,.07);
+  --accent:#6366f1;--green:#84cc16;--amber:#f59e0b;
+  --red:#f43f5e;--sky:#38bdf8;--orange:#f97316;
+  --text:#f1f5f9;--muted:#64748b;--muted2:#94a3b8;
+  --sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px);
+  --sal:env(safe-area-inset-left,0px);--sar:env(safe-area-inset-right,0px);
+}
+*,*::before,*::after{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{height:100%;overscroll-behavior:none}
+body{font-family:"Plus Jakarta Sans",sans-serif;background:var(--bg);color:var(--text);
+     min-height:100%;overscroll-behavior:none;-webkit-overflow-scrolling:touch;overflow-x:hidden}
+.ff{font-family:"Syne",sans-serif}
 
-  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+/* Mesh bg */
+body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:radial-gradient(ellipse 65% 45% at 10% 15%,rgba(99,102,241,.16) 0%,transparent 55%),
+             radial-gradient(ellipse 50% 40% at 90% 80%,rgba(132,204,22,.10) 0%,transparent 50%),
+             radial-gradient(ellipse 40% 50% at 50% 50%,rgba(56,189,248,.06) 0%,transparent 50%)}
 
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    overscroll-behavior: none;
-    -webkit-overflow-scrolling: touch;
-  }
+/* Cards */
+.card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:18px}
+.glass-card{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:14px}
+.glass{background:rgba(13,21,38,.88);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
 
-  h1,h2,h3,h4,.font-display { font-family: 'Syne', sans-serif; }
+/* Inputs */
+.inp{width:100%;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.09);
+     color:var(--text);border-radius:13px;padding:14px 16px;font-size:16px;
+     font-family:inherit;outline:none;transition:border-color .2s,background .2s;
+     appearance:none;-webkit-appearance:none}
+.inp:focus{border-color:var(--accent);background:rgba(99,102,241,.08)}
+.inp::placeholder{color:var(--muted)}
+select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;padding-right:40px}
+textarea.inp{resize:none;line-height:1.5}
 
-  /* Glassmorphism Cards */
-  .glass {
-    background: rgba(17,24,39,0.8);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid var(--border);
-  }
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:none;
+     border-radius:13px;padding:15px 22px;font-size:15px;font-weight:700;
+     font-family:"Syne",sans-serif;cursor:pointer;width:100%;
+     transition:transform .15s,opacity .15s;position:relative;overflow:hidden;
+     -webkit-user-select:none;user-select:none;touch-action:manipulation}
+.btn:active{transform:scale(.975);opacity:.92}
+.btn-primary{background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;box-shadow:0 6px 20px rgba(99,102,241,.35)}
+.btn-ghost{background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.10);color:var(--text)}
+.btn-ghost:active{background:rgba(255,255,255,.09)}
+.btn-danger{background:rgba(244,63,94,.12);border:1.5px solid rgba(244,63,94,.3);color:#fb7185}
+.btn-sky{background:rgba(56,189,248,.12);border:1.5px solid rgba(56,189,248,.3);color:#7dd3fc}
+.btn-sm{padding:9px 16px;font-size:13px;border-radius:10px}
+.btn-xs{padding:6px 12px;font-size:12px;border-radius:8px}
+.btn-icon{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;
+          justify-content:center;cursor:pointer;border:1px solid var(--border);
+          background:rgba(255,255,255,.06);transition:transform .15s,background .15s;
+          -webkit-user-select:none;user-select:none;touch-action:manipulation}
+.btn-icon:active{transform:scale(.88)}
 
-  .glass-light {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.08);
-  }
+/* Badges */
+.badge{display:inline-flex;align-items:center;border-radius:20px;padding:3px 9px;
+       font-size:10.5px;font-weight:700;font-family:"Syne",sans-serif;letter-spacing:.4px;white-space:nowrap}
+.b-lead    {background:rgba(99,102,241,.18);color:#a5b4fc;border:1px solid rgba(99,102,241,.3)}
+.b-prospect{background:rgba(245,158,11,.18);color:#fcd34d;border:1px solid rgba(245,158,11,.3)}
+.b-client  {background:rgba(132,204,22,.18);color:#bef264;border:1px solid rgba(132,204,22,.3)}
+.b-lost    {background:rgba(244,63,94,.18);color:#fda4af;border:1px solid rgba(244,63,94,.3)}
+.b-rappel  {background:rgba(249,115,22,.18);color:#fdba74;border:1px solid rgba(249,115,22,.3)}
+.b-admin   {background:linear-gradient(135deg,rgba(99,102,241,.25),rgba(132,204,22,.15));color:#c7d2fe;border:1px solid rgba(99,102,241,.4)}
+.b-voip    {background:rgba(56,189,248,.18);color:#7dd3fc;border:1px solid rgba(56,189,248,.3)}
+.b-ok      {background:rgba(132,204,22,.18);color:#bef264;border:1px solid rgba(132,204,22,.3)}
 
-  /* Gradient Mesh Background */
-  .mesh-bg {
-    background:
-      radial-gradient(ellipse 80% 50% at 20% 30%, rgba(96,112,244,0.15) 0%, transparent 60%),
-      radial-gradient(ellipse 60% 40% at 80% 70%, rgba(110,245,106,0.08) 0%, transparent 50%),
-      radial-gradient(ellipse 50% 60% at 50% 50%, rgba(255,107,71,0.05) 0%, transparent 50%),
-      #0a0f1e;
-  }
+/* Label */
+.lbl{display:block;font-size:10.5px;font-weight:700;color:var(--muted);
+     letter-spacing:.7px;margin-bottom:7px;font-family:"Syne",sans-serif;text-transform:uppercase}
 
-  /* Scrollbar hide */
-  .scrollbar-hide::-webkit-scrollbar { display: none; }
-  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+/* Tab strip */
+.tab-strip{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scroll-snap-type:x mandatory}
+.tab-strip::-webkit-scrollbar{display:none}
+.tab-pill{flex-shrink:0;padding:8px 15px;border-radius:20px;font-size:12px;font-weight:700;
+          font-family:"Syne",sans-serif;cursor:pointer;border:none;transition:all .18s;
+          scroll-snap-align:start;touch-action:manipulation;-webkit-user-select:none;user-select:none}
+.tab-pill.on{background:var(--accent);color:#fff;box-shadow:0 4px 14px rgba(99,102,241,.4)}
+.tab-pill:not(.on){background:rgba(255,255,255,.05);color:var(--muted2)}
 
-  /* Animations */
-  @keyframes slideUp { from { opacity:0; transform:translateY(24px) } to { opacity:1; transform:translateY(0) } }
-  @keyframes fadeIn { from { opacity:0 } to { opacity:1 } }
-  @keyframes pulse-glow { 0%,100% { box-shadow:0 0 0 0 rgba(96,112,244,0.4) } 50% { box-shadow:0 0 0 8px rgba(96,112,244,0) } }
-  @keyframes shimmer { 0% { background-position:-200% 0 } 100% { background-position:200% 0 } }
-  @keyframes float { 0%,100% { transform:translateY(0) } 50% { transform:translateY(-6px) } }
-  @keyframes notifSlide { from { transform:translateX(120%) opacity:0 } to { transform:translateX(0) opacity:1 } }
-  @keyframes spin { to { transform:rotate(360deg) } }
+/* Bottom nav */
+.bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+           padding:9px 2px;cursor:pointer;border-radius:12px;margin:3px;
+           transition:background .18s;touch-action:manipulation;-webkit-user-select:none;user-select:none}
+.bnav-item:active{background:rgba(255,255,255,.06)}
+.bnav-icon{font-size:20px;line-height:1;color:var(--muted);transition:color .18s,transform .2s}
+.bnav-label{font-size:9.5px;font-weight:700;font-family:"Syne",sans-serif;color:var(--muted);
+            transition:color .18s;letter-spacing:.3px}
+.bnav-item.on .bnav-icon{color:var(--accent);transform:scale(1.15)}
+.bnav-item.on .bnav-label{color:var(--accent)}
 
-  .animate-slide-up { animation: slideUp 0.4s cubic-bezier(0.16,1,0.3,1) both; }
-  .animate-fade-in { animation: fadeIn 0.3s ease both; }
-  .animate-pulse-glow { animation: pulse-glow 2s infinite; }
-  .animate-float { animation: float 3s ease-in-out infinite; }
-  .animate-spin { animation: spin 0.8s linear infinite; }
+/* Pages */
+.page{display:none}
+.page.on{display:block;animation:pgIn .28s cubic-bezier(.16,1,.3,1) both}
+@keyframes pgIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 
-  .skeleton {
-    background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 75%);
-    background-size: 200% 100%;
-    animation: shimmer 1.5s infinite;
-  }
+/* Modals */
+.overlay{position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.72);
+         backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+         display:flex;align-items:flex-end;justify-content:center;
+         animation:fadeIn .2s ease;overscroll-behavior:none}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.sheet{background:#0d1526;border-radius:24px 24px 0 0;border-top:1px solid rgba(255,255,255,.1);
+       width:100%;max-width:640px;padding:20px;
+       padding-bottom:calc(20px + var(--sab));max-height:93vh;overflow-y:auto;
+       animation:sheetUp .32s cubic-bezier(.16,1,.3,1) both;overscroll-behavior:contain}
+@keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.drag-pill{width:38px;height:4px;background:rgba(255,255,255,.15);border-radius:2px;margin:0 auto 20px}
 
-  /* Input styles */
-  .input-dark {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.1);
-    color: var(--text);
-    border-radius: 12px;
-    padding: 14px 16px;
-    width: 100%;
-    font-size: 16px; /* prevents iOS zoom */
-    transition: border-color 0.2s, background 0.2s;
-    outline: none;
-    font-family: 'DM Sans', sans-serif;
-  }
-  .input-dark:focus { border-color: var(--accent); background: rgba(96,112,244,0.08); }
-  .input-dark::placeholder { color: var(--muted); }
+/* Toasts */
+.toast{position:fixed;right:14px;z-index:200;
+       top:calc(14px + var(--sat));border-radius:14px;padding:13px 16px;
+       max-width:290px;min-width:180px;pointer-events:none;
+       animation:toastIn .32s cubic-bezier(.16,1,.3,1) both;
+       backdrop-filter:blur(16px);box-shadow:0 12px 40px rgba(0,0,0,.5)}
+@keyframes toastIn{from{transform:translateX(108%);opacity:0}to{transform:translateX(0);opacity:1}}
+.toast-out{animation:toastOut .28s ease forwards}
+@keyframes toastOut{to{transform:translateX(108%);opacity:0}}
 
-  /* Button styles */
-  .btn-primary {
-    background: linear-gradient(135deg, #6070f4, #4f56e8);
-    color: white;
-    border: none;
-    border-radius: 14px;
-    padding: 16px 24px;
-    font-size: 16px;
-    font-weight: 600;
-    font-family: 'Syne', sans-serif;
-    cursor: pointer;
-    width: 100%;
-    transition: all 0.2s;
-    position: relative;
-    overflow: hidden;
-  }
-  .btn-primary:active { transform: scale(0.98); opacity: 0.9; }
-  .btn-primary::after {
-    content: '';
-    position: absolute; inset: 0;
-    background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 100%);
-  }
+/* FAB */
+.fab{position:fixed;bottom:calc(76px + var(--sab));right:calc(16px + var(--sar));
+     width:58px;height:58px;border-radius:18px;display:flex;align-items:center;
+     justify-content:center;font-size:26px;cursor:pointer;border:none;color:#fff;
+     z-index:50;background:linear-gradient(135deg,#6366f1,#4f46e5);
+     box-shadow:0 8px 28px rgba(99,102,241,.5);touch-action:manipulation;
+     animation:fabPulse 2.8s infinite}
+.fab:active{transform:scale(.9)}
+@keyframes fabPulse{0%,100%{box-shadow:0 8px 28px rgba(99,102,241,.5)}50%{box-shadow:0 8px 40px rgba(99,102,241,.75)}}
 
-  .btn-secondary {
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.12);
-    color: var(--text);
-    border-radius: 14px;
-    padding: 14px 24px;
-    font-size: 15px;
-    font-weight: 500;
-    cursor: pointer;
-    width: 100%;
-    transition: all 0.2s;
-    font-family: 'DM Sans', sans-serif;
-  }
-  .btn-secondary:active { transform: scale(0.98); background: rgba(255,255,255,0.1); }
+/* Contact row */
+.crow{border-radius:16px;padding:14px;border:1px solid var(--border);
+      background:rgba(16,29,53,.7);cursor:pointer;
+      transition:border-color .18s,background .18s;
+      touch-action:manipulation;-webkit-user-select:none;user-select:none}
+.crow:active{border-color:rgba(99,102,241,.4);background:rgba(99,102,241,.06)}
 
-  .btn-icon {
-    width: 48px; height: 48px;
-    border-radius: 12px;
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer;
-    transition: all 0.2s;
-    border: none;
-    font-size: 20px;
-  }
-  .btn-icon:active { transform: scale(0.92); }
+/* Pipeline */
+.pipe-col{min-width:220px;flex-shrink:0}
+.pipe-card{border-radius:14px;padding:12px;margin-bottom:8px;
+           background:rgba(16,29,53,.8);border:1px solid var(--border);
+           cursor:pointer;transition:opacity .18s,transform .18s}
+.pipe-card.dragging{opacity:.5;transform:scale(.97);cursor:grabbing}
+.pipe-drop-zone{min-height:120px;border-radius:14px;border:2px solid transparent;
+                padding:2px;transition:all .18s}
+.pipe-drop-zone.drag-over{background:rgba(99,102,241,.1);border:2px dashed rgba(99,102,241,.5) !important}
 
-  /* Status badges */
-  .badge { border-radius: 20px; padding: 4px 10px; font-size: 11px; font-weight: 600; letter-spacing: 0.5px; }
-  .badge-lead { background: rgba(96,112,244,0.2); color: #818cf8; border: 1px solid rgba(96,112,244,0.3); }
-  .badge-prospect { background: rgba(251,191,36,0.2); color: #fbbf24; border: 1px solid rgba(251,191,36,0.3); }
-  .badge-client { background: rgba(110,245,106,0.2); color: #6ef56a; border: 1px solid rgba(110,245,106,0.3); }
-  .badge-lost { background: rgba(255,107,71,0.2); color: #ff6b47; border: 1px solid rgba(255,107,71,0.3); }
-  .badge-rappel { background: rgba(251,146,60,0.2); color: #fb923c; border: 1px solid rgba(251,146,60,0.3); }
-  .badge-admin { background: linear-gradient(135deg, rgba(96,112,244,0.3), rgba(110,245,106,0.2)); color: #a5b4fc; border: 1px solid rgba(96,112,244,0.4); }
+/* Stat cards */
+.stat-card{border-radius:18px;padding:17px;background:var(--card);border:1px solid var(--border)}
 
-  /* Nav */
-  .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 4px; cursor: pointer; transition: all 0.2s; border-radius: 12px; margin: 4px; }
-  .nav-item.active .nav-icon { color: var(--accent); }
-  .nav-item.active .nav-label { color: var(--accent); }
-  .nav-item .nav-icon { font-size: 22px; color: var(--muted); transition: color 0.2s; }
-  .nav-item .nav-label { font-size: 10px; color: var(--muted); font-weight: 500; transition: color 0.2s; }
-  .nav-item:active { background: rgba(255,255,255,0.05); }
+/* AI box */
+.ai-box{background:linear-gradient(135deg,rgba(99,102,241,.12),rgba(132,204,22,.07));
+        border:1px solid rgba(99,102,241,.25);border-radius:18px;padding:16px}
 
-  /* Page transitions */
-  .page { display: none; animation: slideUp 0.3s cubic-bezier(0.16,1,0.3,1) both; }
-  .page.active { display: block; }
+/* Progress */
+.prog{height:5px;border-radius:3px;background:rgba(255,255,255,.07);overflow:hidden}
+.prog-bar{height:100%;border-radius:3px;background:linear-gradient(90deg,#6366f1,#84cc16);transition:width .7s cubic-bezier(.16,1,.3,1)}
 
-  /* Pipeline columns */
-  .pipeline-col { min-width: 240px; flex-shrink: 0; }
+/* Offline */
+.offline-bar{background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;
+             padding:10px 16px;padding-top:calc(10px + var(--sat));
+             text-align:center;font-size:13px;font-weight:700;font-family:"Syne",sans-serif}
 
-  /* Contact card */
-  .contact-card { border-radius: 16px; padding: 16px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s; border: 1px solid var(--border); background: rgba(17,24,39,0.6); }
-  .contact-card:active { transform: scale(0.99); border-color: rgba(96,112,244,0.3); }
+/* Skeleton */
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+.skel{background:linear-gradient(90deg,rgba(255,255,255,.04) 25%,rgba(255,255,255,.09) 50%,rgba(255,255,255,.04) 75%);
+      background-size:200% 100%;animation:shimmer 1.6s infinite;border-radius:14px}
 
-  /* Modal */
-  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(10px); z-index: 100; display: flex; align-items: flex-end; justify-content: center; animation: fadeIn 0.2s ease; }
-  .modal-sheet { background: #111827; border-radius: 24px 24px 0 0; width: 100%; max-width: 600px; padding: 20px; padding-bottom: calc(20px + var(--safe-bottom)); max-height: 92vh; overflow-y: auto; animation: slideUp 0.35s cubic-bezier(0.16,1,0.3,1) both; }
-  .modal-handle { width: 36px; height: 4px; background: rgba(255,255,255,0.15); border-radius: 2px; margin: 0 auto 20px; }
+/* Spinner */
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{display:inline-block;width:20px;height:20px;border:2.5px solid rgba(255,255,255,.12);
+         border-top-color:var(--accent);border-radius:50%;animation:spin .75s linear infinite;vertical-align:middle}
 
-  /* Notif toast */
-  .notif-toast { position: fixed; top: calc(16px + var(--safe-top)); right: 16px; z-index: 200; border-radius: 14px; padding: 14px 16px; max-width: 320px; animation: notifSlide 0.4s cubic-bezier(0.16,1,0.3,1) both; }
+/* Logo */
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.logo-float{animation:float 3.5s ease-in-out infinite}
+.logo-text{font-family:"Syne",sans-serif;font-size:38px;font-weight:800;
+           background:linear-gradient(135deg,#a5b4fc,#bef264);
+           -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 
-  /* Offline banner */
-  .offline-banner { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; padding: 10px 16px; text-align: center; font-size: 13px; font-weight: 600; }
+/* Dup warning */
+.dup-warn{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);
+          border-radius:10px;padding:9px 12px;font-size:12px;color:#fcd34d;margin-bottom:6px}
 
-  /* Chart container */
-  .chart-container { position: relative; height: 200px; }
+/* Pag */
+.pag-btn{padding:8px 16px;border-radius:10px;font-size:13px;font-weight:700;
+         font-family:"Syne",sans-serif;cursor:pointer;border:1.5px solid var(--border);
+         background:var(--card);color:var(--muted2);transition:all .18s}
+.pag-btn.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.pag-btn:disabled{opacity:.3;cursor:not-allowed}
 
-  /* Loader */
-  .loader { width: 24px; height: 24px; border: 3px solid rgba(255,255,255,0.1); border-top-color: var(--accent); border-radius: 50%; display: inline-block; animation: spin 0.7s linear infinite; }
+/* App padding */
+#app{padding-bottom:calc(68px + var(--sab))}
+#hdr{position:sticky;top:0;z-index:40;padding:12px 16px;padding-top:calc(12px + var(--sat))}
 
-  /* Select */
-  select.input-dark { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; }
+/* Auth */
+#auth-screen{min-height:100vh;display:flex;flex-direction:column;justify-content:center;
+             padding:24px 20px;padding-top:calc(40px + var(--sat));padding-bottom:calc(24px + var(--sab))}
 
-  /* Scrollable tabs */
-  .tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
-  .tab-btn { flex-shrink: 0; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; border: none; }
-  .tab-btn.active { background: var(--accent); color: white; }
-  .tab-btn:not(.active) { background: rgba(255,255,255,0.06); color: var(--muted); }
+/* Scrollbar */
+.no-sb::-webkit-scrollbar{display:none}
+.no-sb{-ms-overflow-style:none;scrollbar-width:none}
 
-  /* Progress bar */
-  .progress-bar { height: 6px; border-radius: 3px; background: rgba(255,255,255,0.08); overflow: hidden; }
-  .progress-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, #6070f4, #6ef56a); transition: width 0.6s cubic-bezier(0.16,1,0.3,1); }
-
-  /* Stat card */
-  .stat-card { border-radius: 18px; padding: 18px; background: rgba(17,24,39,0.8); border: 1px solid var(--border); }
-
-  /* AI module */
-  .ai-gradient { background: linear-gradient(135deg, rgba(96,112,244,0.15), rgba(110,245,106,0.1)); border: 1px solid rgba(96,112,244,0.3); border-radius: 16px; padding: 16px; }
-
-  /* Swipe delete hint */
-  .swipe-hint { font-size: 11px; color: var(--muted); text-align: center; margin-top: 8px; }
-
-  /* Floating action button */
-  .fab {
-    position: fixed; bottom: calc(80px + var(--safe-bottom)); right: 20px;
-    width: 58px; height: 58px; border-radius: 18px;
-    background: linear-gradient(135deg, #6070f4, #4f56e8);
-    box-shadow: 0 8px 32px rgba(96,112,244,0.4);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 26px; cursor: pointer; border: none; color: white;
-    transition: all 0.2s; z-index: 50;
-    animation: pulse-glow 2s infinite;
-  }
-  .fab:active { transform: scale(0.92); }
-
-  /* Auth page */
-  .auth-logo { font-family: 'Syne', sans-serif; font-size: 36px; font-weight: 800; background: linear-gradient(135deg, #818cf8, #6ef56a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-
-  /* Stagger animation delays */
-  .delay-1 { animation-delay: 0.05s; }
-  .delay-2 { animation-delay: 0.1s; }
-  .delay-3 { animation-delay: 0.15s; }
-  .delay-4 { animation-delay: 0.2s; }
+/* VOIP popup */
+.voip-popup{position:fixed;top:calc(10px + var(--sat));left:50%;transform:translateX(-50%);
+            z-index:300;width:calc(100% - 32px);max-width:380px;
+            background:linear-gradient(135deg,#0d1526,#101d35);
+            border:1px solid rgba(56,189,248,.4);border-radius:20px;padding:16px;
+            box-shadow:0 16px 48px rgba(56,189,248,.25);
+            animation:pgIn .4s cubic-bezier(.16,1,.3,1) both}
+.voip-pulse{width:48px;height:48px;border-radius:50%;background:rgba(56,189,248,.2);
+            display:flex;align-items:center;justify-content:center;font-size:22px;
+            animation:vPulse 1.2s ease-in-out infinite}
+@keyframes vPulse{0%,100%{box-shadow:0 0 0 0 rgba(56,189,248,.4)}50%{box-shadow:0 0 0 12px rgba(56,189,248,0)}}
 </style>
 </head>
+<body>
 
-<body class="mesh-bg min-h-screen">
+<!-- OFFLINE BAR -->
+<div id="offline-bar" class="offline-bar" style="display:none">⚡ Mode Hors-Ligne — Modifications en file d'attente</div>
+<!-- TOASTS -->
+<div id="toasts" style="position:fixed;top:0;right:0;z-index:200;padding:14px;display:flex;flex-direction:column;gap:8px;align-items:flex-end;pointer-events:none;padding-top:calc(14px + var(--sat))"></div>
 
-<!-- OFFLINE BANNER -->
-<div id="offline-banner" class="offline-banner hidden">
-  ⚡ Mode Hors-Ligne — Modifications en attente de synchronisation
-</div>
-
-<!-- NOTIFICATION CONTAINER -->
-<div id="notif-container" class="fixed top-0 right-0 z-50 p-4 space-y-2" style="padding-top: calc(16px + env(safe-area-inset-top))"></div>
-
-<!-- ======== AUTH SCREEN ======== -->
-<div id="auth-screen" class="min-h-screen flex flex-col justify-center px-6 py-12">
-  <div class="max-w-md mx-auto w-full">
-
-    <!-- Logo -->
-    <div class="text-center mb-10 animate-slide-up">
-      <div class="animate-float inline-block mb-4">
-        <div class="w-20 h-20 rounded-3xl flex items-center justify-center mx-auto" style="background:linear-gradient(135deg,#6070f4,#4f56e8);box-shadow:0 16px 48px rgba(96,112,244,0.4)">
-          <span style="font-size:38px">⚡</span>
-        </div>
-      </div>
-      <div class="auth-logo">NexCRM</div>
-      <p style="color:var(--muted); font-size:14px; margin-top:6px;">Intelligence Commerciale Nouvelle Génération</p>
+<!-- VOIP POPUP -->
+<div id="voip-popup" class="voip-popup" style="display:none">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+    <div class="voip-pulse">📞</div>
+    <div>
+      <div class="ff" style="font-size:11px;font-weight:700;color:var(--sky);letter-spacing:.5px">APPEL ENTRANT</div>
+      <div class="ff" style="font-size:16px;font-weight:800" id="voip-name">Inconnu</div>
+      <div style="font-size:13px;color:var(--muted2)" id="voip-num">—</div>
     </div>
-
-    <!-- Tab switch -->
-    <div class="glass-light rounded-2xl p-1 flex mb-6 animate-slide-up delay-1">
-      <button onclick="switchAuthTab('signin')" id="tab-signin" class="flex-1 py-3 rounded-xl text-sm font-semibold transition-all" style="background:var(--accent);color:white;">Connexion</button>
-      <button onclick="switchAuthTab('signup')" id="tab-signup" class="flex-1 py-3 rounded-xl text-sm font-semibold transition-all" style="color:var(--muted);">Inscription</button>
-    </div>
-
-    <!-- Sign In Form -->
-    <div id="form-signin" class="animate-slide-up delay-2">
-      <div class="space-y-4">
-        <div>
-          <label style="color:var(--muted);font-size:12px;font-weight:600;letter-spacing:0.5px;display:block;margin-bottom:8px;">EMAIL</label>
-          <input id="signin-email" type="email" placeholder="votre@email.com" class="input-dark"/>
-        </div>
-        <div>
-          <label style="color:var(--muted);font-size:12px;font-weight:600;letter-spacing:0.5px;display:block;margin-bottom:8px;">MOT DE PASSE</label>
-          <input id="signin-password" type="password" placeholder="••••••••" class="input-dark"/>
-        </div>
-        <button onclick="signIn()" id="btn-signin" class="btn-primary mt-2">
-          <span id="signin-text">Se connecter</span>
-        </button>
-      </div>
-    </div>
-
-    <!-- Sign Up Form -->
-    <div id="form-signup" class="hidden animate-slide-up delay-2">
-      <div class="space-y-4">
-        <div>
-          <label style="color:var(--muted);font-size:12px;font-weight:600;letter-spacing:0.5px;display:block;margin-bottom:8px;">NOM COMPLET</label>
-          <input id="signup-name" type="text" placeholder="Jean Dupont" class="input-dark"/>
-        </div>
-        <div>
-          <label style="color:var(--muted);font-size:12px;font-weight:600;letter-spacing:0.5px;display:block;margin-bottom:8px;">EMAIL</label>
-          <input id="signup-email" type="email" placeholder="votre@email.com" class="input-dark"/>
-        </div>
-        <div>
-          <label style="color:var(--muted);font-size:12px;font-weight:600;letter-spacing:0.5px;display:block;margin-bottom:8px;">MOT DE PASSE</label>
-          <input id="signup-password" type="password" placeholder="Min. 6 caractères" class="input-dark"/>
-        </div>
-        <button onclick="signUp()" id="btn-signup" class="btn-primary mt-2">
-          <span id="signup-text">Créer mon compte</span>
-        </button>
-      </div>
-    </div>
-
-    <p id="auth-error" class="text-center mt-4 hidden" style="color:#ff6b47;font-size:13px;"></p>
-    <p class="text-center mt-6" style="color:var(--muted);font-size:11px;">🔒 Vos données sont chiffrées et sécurisées</p>
+  </div>
+  <div style="font-family:Syne,sans-serif;font-size:22px;font-weight:700;color:#7dd3fc;text-align:center;margin-bottom:14px" id="voip-timer">00:00</div>
+  <div style="display:flex;gap:10px">
+    <button onclick="voipAnswer()" class="btn btn-sky btn-sm" style="flex:1">✅ Répondre</button>
+    <button onclick="voipDecline()" class="btn btn-danger btn-sm" style="flex:1">❌ Refuser</button>
   </div>
 </div>
 
-<!-- ======== MAIN APP ======== -->
-<div id="main-app" class="hidden" style="padding-bottom: calc(72px + env(safe-area-inset-bottom));">
+<!-- ═══════ AUTH ═══════ -->
+<div id="auth-screen">
+  <div style="max-width:420px;margin:0 auto;width:100%">
+    <div style="text-align:center;margin-bottom:32px;animation:pgIn .5s cubic-bezier(.16,1,.3,1) both">
+      <div class="logo-float" style="display:inline-block;margin-bottom:16px">
+        <div style="width:82px;height:82px;border-radius:26px;background:linear-gradient(135deg,#6366f1,#4f46e5);margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:38px;box-shadow:0 20px 56px rgba(99,102,241,.5)">⚡</div>
+      </div>
+      <div class="logo-text">NexCRM</div>
+      <p style="color:var(--muted);font-size:13px;margin-top:6px">Intelligence Commerciale Nouvelle Génération</p>
+    </div>
+    <div class="glass-card" style="padding:4px;display:flex;margin-bottom:20px;border-radius:16px">
+      <button id="at-in" onclick="authTab('in')" class="ff" style="flex:1;padding:12px;border-radius:13px;border:none;font-size:13.5px;font-weight:700;cursor:pointer;background:var(--accent);color:#fff;transition:all .18s">Connexion</button>
+      <button id="at-up" onclick="authTab('up')" class="ff" style="flex:1;padding:12px;border-radius:13px;border:none;font-size:13.5px;font-weight:700;cursor:pointer;background:transparent;color:var(--muted);transition:all .18s">Inscription</button>
+    </div>
+    <div id="f-in">
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div><label class="lbl">Email</label><input id="si-e" type="email" autocomplete="email" placeholder="vous@exemple.com" class="inp"/></div>
+        <div><label class="lbl">Mot de passe</label><input id="si-p" type="password" autocomplete="current-password" placeholder="••••••••" class="inp"/></div>
+        <button id="btn-si" onclick="doSignIn()" class="btn btn-primary" style="margin-top:4px"><span id="si-txt">Se connecter →</span></button>
+        <!-- PATCH 7: Bouton mot de passe oublié VISIBLE sous le formulaire login -->
+        <div style="text-align:center;margin-top:14px">
+          <button onclick="toggleForgotForm()" style="background:none;border:none;color:#a5b4fc;font-size:13px;cursor:pointer;font-family:inherit;text-decoration:underline;padding:4px">
+            🔑 Mot de passe oublié ?
+          </button>
+        </div>
+      </div>
+    </div>
+    <div id="f-up" style="display:none">
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div><label class="lbl">Nom complet</label><input id="su-n" type="text" autocomplete="name" placeholder="Jean Dupont" class="inp"/></div>
+        <div><label class="lbl">Email</label><input id="su-e" type="email" autocomplete="email" placeholder="vous@exemple.com" class="inp"/></div>
+        <div><label class="lbl">Mot de passe</label><input id="su-p" type="password" autocomplete="new-password" placeholder="Min. 6 caractères" class="inp"/></div>
+        <button id="btn-su" onclick="doSignUp()" class="btn btn-primary" style="margin-top:4px"><span id="su-txt">Créer mon compte →</span></button>
+      </div>
+    </div>
+    <!-- PATCH: Forgot Password link -->
+    <div id="forgot-link" style="text-align:center;margin-top:12px">
+      <button onclick="toggleForgotForm()" style="background:none;border:none;color:var(--muted2);font-size:12.5px;cursor:pointer;font-family:inherit;text-decoration:underline">Mot de passe oublié ?</button>
+    </div>
+
+    <!-- PATCH: Forgot Password form -->
+    <div id="f-forgot" style="display:none;animation:pgIn .3s cubic-bezier(.16,1,.3,1) both">
+      <div style="background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.25);border-radius:16px;padding:16px;margin-top:4px">
+        <div class="ff" style="font-size:13px;font-weight:700;color:#a5b4fc;margin-bottom:10px">🔑 Récupération de compte</div>
+        <div id="forgot-form">
+          <div style="margin-bottom:10px"><label class="lbl">Votre email</label><input id="forgot-email" type="email" autocomplete="email" placeholder="vous@exemple.com" class="inp" style="margin-top:4px"/></div>
+          <button id="btn-forgot" onclick="doForgotPassword()" class="btn btn-primary btn-sm">📧 Envoyer le lien de récupération</button>
+        </div>
+        <div id="forgot-done" style="display:none;text-align:center;padding:8px">
+          <div style="font-size:24px;margin-bottom:8px">📬</div>
+          <div class="ff" style="font-size:13px;font-weight:700;color:#bef264">Email envoyé !</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:4px">Vérifiez votre boîte mail et cliquez sur le lien.</div>
+        </div>
+      </div>
+      <button onclick="toggleForgotForm()" style="width:100%;background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;margin-top:8px;font-family:inherit">← Retour à la connexion</button>
+    </div>
+
+    <p id="auth-err" style="display:none;text-align:center;margin-top:14px;font-size:13px;color:#fb7185"></p>
+    <p style="text-align:center;margin-top:24px;font-size:11.5px;color:var(--muted)">🔒 Chiffré · Sécurisé via Supabase</p>
+  </div>
+</div>
+
+<!-- ═══════ APP ═══════ -->
+<div id="app" style="display:none">
 
   <!-- HEADER -->
-  <div id="app-header" class="glass sticky top-0 z-40 px-4 py-3" style="padding-top: calc(12px + env(safe-area-inset-top))">
-    <div class="flex items-center justify-between">
+  <header id="hdr" class="glass" style="border-bottom:1px solid var(--border)">
+    <div style="display:flex;align-items:center;justify-content:space-between">
       <div>
-        <div class="font-display font-bold text-lg" id="header-title">Dashboard</div>
-        <div class="text-xs" style="color:var(--muted)" id="header-sub">Vue d'ensemble</div>
+        <div class="ff" style="font-size:18px;font-weight:800;line-height:1.1" id="hdr-t">Dashboard</div>
+        <div style="font-size:11.5px;color:var(--muted);margin-top:2px" id="hdr-s">Vue globale</div>
       </div>
-      <div class="flex items-center gap-2">
-        <div id="sync-indicator" class="hidden">
-          <div class="loader" style="width:18px;height:18px;border-width:2px"></div>
-        </div>
-        <button onclick="openProfileModal()" class="w-10 h-10 rounded-2xl flex items-center justify-center text-lg" style="background:rgba(96,112,244,0.2);border:1px solid rgba(96,112,244,0.3)">
-          <span id="user-avatar">👤</span>
-        </button>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div id="sync-ind" style="display:none"><div class="spinner" style="width:16px;height:16px;border-width:2px"></div></div>
+        <div id="pend-dot" style="display:none;width:9px;height:9px;border-radius:50%;background:var(--amber);box-shadow:0 0 6px var(--amber)"></div>
+        <button onclick="openProfile()" id="avatar-btn" class="btn-icon" style="background:rgba(99,102,241,.2);border-color:rgba(99,102,241,.35);font-size:18px">👤</button>
       </div>
+    </div>
+  </header>
+
+  <!-- DASHBOARD -->
+  <div id="pg-dash" class="page on" style="padding:16px;display:flex;flex-direction:column;gap:14px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="stat-card"><div class="lbl" style="margin-bottom:4px">CONTACTS</div><div class="ff" style="font-size:38px;font-weight:900;line-height:1" id="k-total">–</div><div style="font-size:11px;color:#a5b4fc;margin-top:4px">total base</div></div>
+      <div class="stat-card"><div class="lbl" style="margin-bottom:4px">CLIENTS</div><div class="ff" style="font-size:38px;font-weight:900;line-height:1;color:#bef264" id="k-cli">–</div><div style="font-size:11px;color:#bef264;margin-top:4px">convertis</div></div>
+      <div class="stat-card"><div class="lbl" style="margin-bottom:4px">CONVERSION</div><div class="ff" style="font-size:32px;font-weight:900;line-height:1;color:#fcd34d" id="k-conv">–</div><div class="prog" style="margin-top:8px"><div class="prog-bar" id="k-prog" style="width:0%"></div></div></div>
+      <div class="stat-card"><div class="lbl" style="margin-bottom:4px">CA PRÉV.</div><div class="ff" style="font-size:24px;font-weight:900;line-height:1;color:#fdba74" id="k-ca">–</div><div style="font-size:11px;color:#fdba74;margin-top:4px">estimé</div></div>
+    </div>
+    <div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <span class="ff" style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.6px">🔔 RAPPELS URGENTS</span>
+        <span class="badge b-rappel" id="rappel-cnt">0</span>
+      </div>
+      <div id="rappels-list" style="display:flex;flex-direction:column;gap:7px"></div>
+    </div>
+    <div class="card"><div class="ff" style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.6px;margin-bottom:12px">📊 PIPELINE</div><div style="position:relative;height:180px"><canvas id="ch-pipe"></canvas></div></div>
+    <div class="card"><div class="ff" style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.6px;margin-bottom:12px">📈 ACTIVITÉ 7J</div><div style="position:relative;height:150px"><canvas id="ch-act"></canvas></div></div>
+    <div class="ai-box">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <span style="font-size:24px;animation:float 3s ease-in-out infinite;display:inline-block">🤖</span>
+        <span class="ff" style="font-size:15px;font-weight:800;background:linear-gradient(135deg,#a5b4fc,#bef264);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">IA — Prospect Prioritaire</span>
+      </div>
+      <div id="ai-suggest" style="font-size:13px;color:#c7d2fe;line-height:1.6"><span class="spinner"></span> Analyse...</div>
+    </div>
+    <div id="adm-zone" style="display:none;flex-direction:column;gap:10px">
+      <div style="display:flex;align-items:center;gap:8px"><span class="ff" style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.6px">⚙️ ZONE ADMIN</span><span class="badge b-admin">Admin</span></div>
+      <button onclick="doExport()" class="btn btn-ghost btn-sm">📥 Exporter base (.xlsx)</button>
+      <button onclick="confirmNuke()" class="btn btn-danger btn-sm">🗑️ Réinitialiser toute la base</button>
     </div>
   </div>
 
-  <!-- ========= PAGE: DASHBOARD ========= -->
-  <div id="page-dashboard" class="page active px-4 py-4 space-y-4">
-
-    <!-- KPI Grid -->
-    <div class="grid grid-cols-2 gap-3">
-      <div class="stat-card animate-slide-up">
-        <div class="text-xs font-semibold mb-1" style="color:var(--muted)">TOTAL LEADS</div>
-        <div class="text-3xl font-display font-bold" id="kpi-leads">0</div>
-        <div class="text-xs mt-1" style="color:#818cf8">↑ actifs</div>
+  <!-- CONTACTS -->
+  <div id="pg-contacts" class="page" style="padding:12px 16px">
+    <div id="c-toolbar" style="position:sticky;top:0;z-index:20;background:rgba(8,13,26,.94);backdrop-filter:blur(12px);padding:8px 0 12px;display:flex;flex-direction:column;gap:10px">
+      <div style="position:relative">
+        <span style="position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:16px;color:var(--muted);pointer-events:none">🔍</span>
+        <input id="srch" type="search" placeholder="Nom, société, email, téléphone…" class="inp" style="padding-left:42px" oninput="onSearch()"/>
       </div>
-      <div class="stat-card animate-slide-up delay-1">
-        <div class="text-xs font-semibold mb-1" style="color:var(--muted)">CLIENTS</div>
-        <div class="text-3xl font-display font-bold" style="color:#6ef56a" id="kpi-clients">0</div>
-        <div class="text-xs mt-1" style="color:#6ef56a">Convertis</div>
+      <div class="tab-strip no-sb">
+        <button class="tab-pill on" onclick="setStFilter('all',this)">Tous</button>
+        <button class="tab-pill" onclick="setStFilter('lead',this)">Lead</button>
+        <button class="tab-pill" onclick="setStFilter('prospect',this)">Prospect</button>
+        <button class="tab-pill" onclick="setStFilter('rappel',this)">À Rappeler</button>
+        <button class="tab-pill" onclick="setStFilter('client',this)">Client</button>
+        <button class="tab-pill" onclick="setStFilter('lost',this)">Perdu</button>
       </div>
-      <div class="stat-card animate-slide-up delay-2">
-        <div class="text-xs font-semibold mb-1" style="color:var(--muted)">TAUX CONV.</div>
-        <div class="text-3xl font-display font-bold" style="color:#fbbf24" id="kpi-conv">0%</div>
-        <div class="text-xs mt-1" style="color:#fbbf24">Ce mois</div>
-      </div>
-      <div class="stat-card animate-slide-up delay-3">
-        <div class="text-xs font-semibold mb-1" style="color:var(--muted)">CA PRÉV.</div>
-        <div class="text-xl font-display font-bold" style="color:#fb923c" id="kpi-ca">0€</div>
-        <div class="text-xs mt-1" style="color:#fb923c">Estimé</div>
-      </div>
+      <button onclick="document.getElementById('imp-f').click()" class="btn btn-ghost btn-sm">📂 Importer (.xlsx / .csv / .txt)</button>
+      <input id="imp-f" type="file" accept=".xlsx,.xls,.csv,.txt,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/csv,text/plain" style="display:none" onchange="handleImport(event)"/>
     </div>
-
-    <!-- Rappels urgents -->
-    <div class="animate-slide-up delay-2">
-      <div class="flex items-center justify-between mb-3">
-        <h3 class="font-display font-semibold text-sm" style="color:var(--muted)">🔔 RAPPELS URGENTS</h3>
-        <span id="rappels-count" class="badge badge-rappel">0</span>
-      </div>
-      <div id="rappels-list" class="space-y-2"></div>
+    <div id="c-list" style="display:flex;flex-direction:column;gap:0"></div>
+    <div id="c-empty" style="display:none;text-align:center;padding:60px 20px">
+      <div style="font-size:52px;margin-bottom:14px">📋</div>
+      <div class="ff" style="font-size:18px;font-weight:700">Aucun contact</div>
+      <div style="font-size:13px;color:var(--muted);margin-top:6px">Importez un fichier ou appuyez sur +</div>
     </div>
-
-    <!-- Chart Statuts -->
-    <div class="stat-card animate-slide-up delay-3">
-      <h3 class="font-display font-semibold text-sm mb-3" style="color:var(--muted)">📊 PIPELINE DE VENTE</h3>
-      <div class="chart-container">
-        <canvas id="chart-pipeline"></canvas>
-      </div>
+    <div id="c-skel" style="display:flex;flex-direction:column;gap:9px;padding-top:4px">
+      <div class="skel" style="height:74px"></div><div class="skel" style="height:74px"></div><div class="skel" style="height:74px"></div><div class="skel" style="height:74px"></div>
     </div>
-
-    <!-- Chart Activité -->
-    <div class="stat-card animate-slide-up delay-4" id="admin-chart-section">
-      <h3 class="font-display font-semibold text-sm mb-3" style="color:var(--muted)">📈 ACTIVITÉ (7 JOURS)</h3>
-      <div class="chart-container">
-        <canvas id="chart-activity"></canvas>
-      </div>
-    </div>
-
-    <!-- AI Suggestion -->
-    <div class="ai-gradient animate-slide-up delay-4">
-      <div class="flex items-center gap-2 mb-3">
-        <span class="text-xl">🤖</span>
-        <h3 class="font-display font-semibold" style="color:#a5b4fc">IA — Prochain Prospect Chaud</h3>
-      </div>
-      <div id="ai-suggestion" class="text-sm" style="color:#c7d2fe">
-        <div class="loader" style="width:16px;height:16px;border-width:2px;display:inline-block"></div>
-        Analyse en cours...
-      </div>
-    </div>
-
-    <!-- Admin only: Export + Reset -->
-    <div id="admin-section" class="hidden space-y-3 animate-slide-up">
-      <div class="flex items-center gap-2 mb-1">
-        <span class="text-xs font-bold" style="color:var(--muted)">⚙️ ZONE ADMIN</span>
-        <span class="badge badge-admin">Admin</span>
-      </div>
-      <button onclick="exportXLSX()" class="btn-secondary">
-        📥 Exporter la base (.xlsx)
-      </button>
-      <button onclick="confirmDeleteAll()" class="btn-secondary" style="border-color:rgba(255,107,71,0.3);color:#ff6b47;">
-        🗑️ Réinitialiser la base de données
-      </button>
+    <div id="pagination" style="display:none;justify-content:center;align-items:center;gap:8px;padding:16px 0">
+      <button class="pag-btn" id="pg-prev" onclick="pagePrev()">← Préc.</button>
+      <span id="pg-info" class="ff" style="font-size:12px;color:var(--muted)">1/1</span>
+      <button class="pag-btn" id="pg-next" onclick="pageNext()">Suiv. →</button>
     </div>
   </div>
 
-  <!-- ========= PAGE: CONTACTS ========= -->
-  <div id="page-contacts" class="page px-4 py-4">
-
-    <!-- Search + Filter -->
-    <div class="sticky top-0 z-10 pb-3 space-y-3" style="background:rgba(10,15,30,0.9);backdrop-filter:blur(10px);padding-top:4px">
-      <div class="relative">
-        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-lg" style="color:var(--muted)">🔍</span>
-        <input id="search-input" type="text" placeholder="Rechercher nom, email, société..." class="input-dark" style="padding-left:44px" oninput="filterContacts()"/>
-      </div>
-      <div class="tabs scrollbar-hide">
-        <button class="tab-btn active" onclick="filterByStatus('all',this)">Tous</button>
-        <button class="tab-btn" onclick="filterByStatus('lead',this)">Lead</button>
-        <button class="tab-btn" onclick="filterByStatus('prospect',this)">Prospect</button>
-        <button class="tab-btn" onclick="filterByStatus('client',this)">Client</button>
-        <button class="tab-btn" onclick="filterByStatus('rappel',this)">À Rappeler</button>
-        <button class="tab-btn" onclick="filterByStatus('lost',this)">Perdu</button>
-      </div>
-    </div>
-
-    <!-- Import button -->
-    <div class="flex gap-2 mb-4">
-      <button onclick="triggerImport()" class="btn-secondary flex-1" style="padding:12px">
-        📂 Importer Fichier
-      </button>
-      <input id="import-file" type="file" accept=".xlsx,.xls,.csv,.txt" class="hidden" onchange="handleImport(event)"/>
-    </div>
-
-    <!-- Contacts list -->
-    <div id="contacts-list" class="space-y-2"></div>
-    <div id="contacts-empty" class="hidden text-center py-16">
-      <div class="text-5xl mb-4">📋</div>
-      <div class="font-display font-semibold mb-2">Aucun contact</div>
-      <div class="text-sm" style="color:var(--muted)">Importez un fichier ou ajoutez un contact</div>
-    </div>
-    <div id="contacts-loading" class="space-y-3 py-2">
-      <div class="skeleton h-20 rounded-2xl"></div>
-      <div class="skeleton h-20 rounded-2xl"></div>
-      <div class="skeleton h-20 rounded-2xl"></div>
-    </div>
-    <p class="swipe-hint hidden" id="swipe-hint">↑ Appuyez pour voir le détail</p>
+  <!-- PIPELINE -->
+  <div id="pg-pipe" class="page" style="padding:12px 16px">
+    <div class="ff" style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.6px;margin-bottom:12px">KANBAN — Glisser-déposer • Mobile: Tap long pour sélectionner puis tap colonne</div>
+    <div id="pipe-board" style="display:flex;gap:12px;overflow-x:auto;padding-bottom:16px" class="no-sb"></div>
   </div>
 
-  <!-- ========= PAGE: PIPELINE ========= -->
-  <div id="page-pipeline" class="page px-4 py-4">
-    <div class="text-xs font-semibold mb-3" style="color:var(--muted)">PIPELINE VISUEL → Faites défiler →</div>
-    <div class="flex gap-3 overflow-x-auto scrollbar-hide pb-4" id="pipeline-board"></div>
+  <!-- HISTORIQUE -->
+  <div id="pg-hist" class="page" style="padding:12px 16px">
+    <div class="ff" style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.6px;margin-bottom:12px">HISTORIQUE INTERACTIONS</div>
+    <div id="h-list" style="display:flex;flex-direction:column;gap:10px"></div>
+    <div id="h-empty" style="display:none;text-align:center;padding:60px 20px"><div style="font-size:52px;margin-bottom:14px">📞</div><div class="ff" style="font-size:18px;font-weight:700">Aucune interaction</div></div>
   </div>
 
-  <!-- ========= PAGE: HISTORY ========= -->
-  <div id="page-history" class="page px-4 py-4">
-    <div class="text-xs font-semibold mb-3" style="color:var(--muted)">HISTORIQUE DES INTERACTIONS</div>
-    <div id="history-list" class="space-y-3"></div>
-    <div id="history-empty" class="hidden text-center py-16">
-      <div class="text-5xl mb-4">📞</div>
-      <div class="font-display font-semibold">Aucune interaction</div>
-    </div>
-  </div>
-
-  <!-- ========= PAGE: AI ========= -->
-  <div id="page-ai" class="page px-4 py-4 space-y-4">
-    <div class="ai-gradient">
-      <div class="flex items-center gap-2 mb-2">
-        <span class="text-2xl animate-float">🤖</span>
-        <h2 class="font-display font-bold text-lg" style="background:linear-gradient(135deg,#818cf8,#6ef56a);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Module IA CRM</h2>
+  <!-- IA CRM -->
+  <div id="pg-ai" class="page" style="padding:12px 16px;display:flex;flex-direction:column;gap:14px">
+    <div class="ai-box">
+      <div style="display:flex;align-items:center;gap:12px">
+        <span style="font-size:30px;animation:float 3s ease-in-out infinite;display:inline-block">🤖</span>
+        <div><div class="ff" style="font-size:18px;font-weight:800;background:linear-gradient(135deg,#a5b4fc,#bef264);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Module IA CRM</div><div style="font-size:12px;color:var(--muted)">Automatisation & intelligence commerciale</div></div>
       </div>
-      <p class="text-xs" style="color:var(--muted)">Intelligence artificielle pour optimiser votre prospection</p>
     </div>
-
-    <div class="stat-card">
-      <h3 class="font-display font-semibold mb-3" style="color:var(--muted);font-size:12px">🎯 PROSPECTS CHAUDS (IA)</h3>
-      <div id="hot-prospects" class="space-y-3"></div>
+    <div class="card">
+      <div class="ff" style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.6px;margin-bottom:12px">🎯 TOP 5 PROSPECTS CHAUDS</div>
+      <div id="hot-list" style="display:flex;flex-direction:column;gap:9px"></div>
     </div>
-
-    <div class="stat-card">
-      <h3 class="font-display font-semibold mb-3" style="color:var(--muted);font-size:12px">✍️ GÉNÉRATEUR DE MESSAGES</h3>
-      <div class="space-y-3">
-        <div>
-          <label style="color:var(--muted);font-size:12px;font-weight:600;display:block;margin-bottom:8px">SÉLECTIONNER UN CONTACT</label>
-          <select id="ai-contact-select" class="input-dark">
-            <option value="">-- Choisir un contact --</option>
-          </select>
-        </div>
-        <div>
-          <label style="color:var(--muted);font-size:12px;font-weight:600;display:block;margin-bottom:8px">TYPE DE MESSAGE</label>
-          <select id="ai-msg-type" class="input-dark">
-            <option value="email">📧 Email</option>
-            <option value="sms">💬 SMS</option>
+    <div class="card">
+      <div class="ff" style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.6px;margin-bottom:14px">✍️ GÉNÉRATEUR DE MESSAGES</div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div><label class="lbl">Contact cible</label><select id="ai-sel" class="inp"><option value="">-- Choisir --</option></select></div>
+        <div><label class="lbl">Format</label>
+          <select id="ai-fmt" class="inp">
+            <option value="email">📧 Email professionnel</option>
+            <option value="sms">💬 SMS court</option>
             <option value="whatsapp">💚 WhatsApp</option>
           </select>
         </div>
-        <button onclick="generateAIMessage()" class="btn-primary">
-          ✨ Générer le Message IA
-        </button>
+        <button onclick="genMsg()" class="btn btn-primary">✨ Générer Message IA</button>
       </div>
     </div>
-
-    <div id="ai-message-result" class="hidden stat-card">
-      <div class="flex items-center justify-between mb-3">
-        <h3 class="font-display font-semibold" style="color:var(--muted);font-size:12px">💬 MESSAGE GÉNÉRÉ</h3>
-        <div class="flex gap-2">
-          <button onclick="sendMessage('sms')" class="btn-icon text-sm" style="background:rgba(96,112,244,0.2);width:40px;height:40px;font-size:16px" title="SMS">💬</button>
-          <button onclick="sendMessage('email')" class="btn-icon text-sm" style="background:rgba(110,245,106,0.2);width:40px;height:40px;font-size:16px" title="Email">📧</button>
-          <button onclick="sendMessage('whatsapp')" class="btn-icon text-sm" style="background:rgba(37,211,102,0.2);width:40px;height:40px;font-size:16px" title="WhatsApp">💚</button>
+    <div id="ai-result" style="display:none" class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div class="ff" style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.6px">💬 MESSAGE GÉNÉRÉ</div>
+        <div style="display:flex;gap:8px">
+          <button onclick="sendMsg('sms')" class="btn-icon" style="background:rgba(99,102,241,.2);border-color:rgba(99,102,241,.3);font-size:16px;width:40px;height:40px;border-radius:10px">💬</button>
+          <button onclick="sendMsg('email')" class="btn-icon" style="background:rgba(132,204,22,.2);border-color:rgba(132,204,22,.3);font-size:16px;width:40px;height:40px;border-radius:10px">📧</button>
+          <button onclick="sendMsg('whatsapp')" class="btn-icon" style="background:rgba(37,211,102,.2);border-color:rgba(37,211,102,.3);font-size:16px;width:40px;height:40px;border-radius:10px">💚</button>
         </div>
       </div>
-      <div id="ai-message-text" class="text-sm leading-relaxed p-4 rounded-xl" style="background:rgba(255,255,255,0.04);color:#c7d2fe;white-space:pre-wrap;font-size:13px"></div>
-      <button onclick="copyMessage()" class="btn-secondary mt-3" style="padding:10px;font-size:13px">📋 Copier le message</button>
+      <div id="ai-msg-txt" style="font-size:13px;line-height:1.65;padding:14px;border-radius:14px;background:rgba(255,255,255,.04);color:#c7d2fe;white-space:pre-wrap"></div>
+      <button onclick="copyAiMsg()" class="btn btn-ghost btn-sm" style="margin-top:10px">📋 Copier</button>
     </div>
   </div>
 
-  <!-- ========= PAGE: SETTINGS (Admin) ========= -->
-  <div id="page-settings" class="page px-4 py-4 space-y-4">
-    <div class="stat-card">
-      <h3 class="font-display font-semibold mb-4" style="color:var(--muted);font-size:12px">👤 PROFIL</h3>
-      <div class="flex items-center gap-4 mb-4">
-        <div class="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl" style="background:linear-gradient(135deg,rgba(96,112,244,0.3),rgba(110,245,106,0.2))">👤</div>
-        <div>
-          <div class="font-display font-bold" id="profile-name">—</div>
-          <div class="text-sm" style="color:var(--muted)" id="profile-email">—</div>
-          <div class="mt-1" id="profile-role"></div>
-        </div>
+  <!-- VOIP -->
+  <div id="pg-voip" class="page" style="padding:12px 16px;display:flex;flex-direction:column;gap:14px">
+    <div style="background:linear-gradient(135deg,rgba(56,189,248,.12),rgba(99,102,241,.08));border:1px solid rgba(56,189,248,.25);border-radius:18px;padding:16px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <span style="font-size:24px">📡</span>
+        <div><div class="ff" style="font-size:16px;font-weight:800;color:#7dd3fc">VOIP CRM</div><div style="font-size:12px;color:var(--muted)">Compatible Ringover / Kavkom</div></div>
       </div>
-      <button onclick="signOut()" class="btn-secondary" style="border-color:rgba(255,107,71,0.3);color:#ff6b47">
-        🚪 Se déconnecter
-      </button>
+      <span class="badge b-voip" id="voip-status-badge">Déconnecté</span>
     </div>
-
-    <div class="stat-card" id="admin-users-section">
-      <h3 class="font-display font-semibold mb-4" style="color:var(--muted);font-size:12px">⚙️ GESTION DES UTILISATEURS</h3>
-      <div id="users-list" class="space-y-3"></div>
+    <div class="card">
+      <div class="ff" style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.6px;margin-bottom:12px">⚙️ CONFIGURATION</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div><label class="lbl">Fournisseur</label><select id="voip-prov" class="inp"><option value="ringover">Ringover</option><option value="kavkom">Kavkom</option><option value="autre">Autre</option></select></div>
+        <div><label class="lbl">API Key / Token</label><input id="voip-key" type="password" placeholder="Clé API" class="inp"/></div>
+        <div><label class="lbl">Agent ID</label><input id="voip-agent" type="text" placeholder="ID agent" class="inp"/></div>
+        <div><label class="lbl">Webhook URL (appels entrants)</label>
+          <div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;padding:12px;font-size:11.5px;color:var(--muted2);font-family:monospace;word-break:break-all">https://tkikhtpzpixzscpkewlh.supabase.co/functions/v1/voip-webhook</div>
+        </div>
+        <button onclick="voipConnect()" class="btn btn-sky btn-sm">🔗 Connecter VOIP</button>
+        <button onclick="testVoipCall()" class="btn btn-ghost btn-sm">📞 Simuler appel entrant</button>
+      </div>
     </div>
+    <div class="card">
+      <div class="ff" style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.6px;margin-bottom:12px">📋 DERNIERS APPELS</div>
+      <div id="call-log-list" style="display:flex;flex-direction:column;gap:8px"></div>
+      <div id="call-log-empty" style="text-align:center;padding:30px;font-size:13px;color:var(--muted)">Aucun appel</div>
+    </div>
+  </div>
 
-    <div class="stat-card">
-      <h3 class="font-display font-semibold mb-3" style="color:var(--muted);font-size:12px">📱 APPLICATION</h3>
-      <div class="space-y-3">
-        <div class="flex items-center justify-between">
-          <span class="text-sm">Mode Hors-Ligne</span>
-          <span class="badge badge-client">Actif</span>
-        </div>
-        <div class="flex items-center justify-between">
-          <span class="text-sm">Notifications Push</span>
-          <button onclick="requestNotifPermission()" class="badge badge-lead cursor-pointer">Activer</button>
-        </div>
-        <div class="flex items-center justify-between">
-          <span class="text-sm">Version NexCRM</span>
-          <span class="text-sm" style="color:var(--muted)">2.0.0</span>
-        </div>
+  <!-- SETTINGS -->
+  <div id="pg-settings" class="page" style="padding:12px 16px;display:flex;flex-direction:column;gap:14px">
+    <div class="card">
+      <div class="ff" style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.6px;margin-bottom:14px">👤 MON PROFIL</div>
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px">
+        <div style="width:58px;height:58px;border-radius:18px;background:linear-gradient(135deg,rgba(99,102,241,.35),rgba(132,204,22,.2));display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">👤</div>
+        <div><div class="ff" style="font-size:16px;font-weight:800" id="s-name">—</div><div style="font-size:13px;color:var(--muted);margin-top:2px" id="s-email">—</div><div style="margin-top:6px" id="s-role"></div></div>
+      </div>
+      <button onclick="doSignOut()" class="btn btn-danger btn-sm">🚪 Se déconnecter</button>
+      <button onclick="doAdminPasswordReset()" class="btn btn-ghost btn-sm" style="margin-top:8px">🔑 Réinitialiser mon mot de passe</button>
+    </div>
+    <div id="adm-users-card" style="display:none" class="card">
+      <div class="ff" style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.6px;margin-bottom:14px">⚙️ GESTION UTILISATEURS</div>
+      <div id="users-list" style="display:flex;flex-direction:column;gap:10px"></div>
+    </div>
+    <div class="card">
+      <div class="ff" style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.6px;margin-bottom:14px">📱 PARAMÈTRES APP</div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="display:flex;align-items:center;justify-content:space-between"><span style="font-size:14px">Mode Hors-Ligne (IndexedDB)</span><span class="badge b-client">Actif</span></div>
+        <div style="display:flex;align-items:center;justify-content:space-between"><span style="font-size:14px">Notifications Push</span><button onclick="askNotif()" class="badge b-lead" style="cursor:pointer;border:none;font-family:inherit">Activer</button></div>
+        <div style="display:flex;align-items:center;justify-content:space-between"><span style="font-size:14px">Opérations en attente</span><span class="badge b-prospect" id="pend-cnt">0</span></div>
+        <button onclick="idb.clearAll().then(()=>toast('🗑️ Cache vidé','success'))" class="btn btn-ghost btn-sm">🗑️ Vider cache local</button>
       </div>
     </div>
   </div>
 
-  <!-- BOTTOM NAVIGATION -->
-  <nav class="glass fixed bottom-0 left-0 right-0 z-40 flex" style="padding-bottom: env(safe-area-inset-bottom)">
-    <div class="nav-item active" onclick="navigate('dashboard')" id="nav-dashboard">
-      <span class="nav-icon">📊</span>
-      <span class="nav-label">Dashboard</span>
-    </div>
-    <div class="nav-item" onclick="navigate('contacts')" id="nav-contacts">
-      <span class="nav-icon">👥</span>
-      <span class="nav-label">Contacts</span>
-    </div>
-    <div class="nav-item" onclick="navigate('pipeline')" id="nav-pipeline">
-      <span class="nav-icon">🔄</span>
-      <span class="nav-label">Pipeline</span>
-    </div>
-    <div class="nav-item" onclick="navigate('history')" id="nav-history">
-      <span class="nav-icon">📞</span>
-      <span class="nav-label">Historique</span>
-    </div>
-    <div class="nav-item" onclick="navigate('ai')" id="nav-ai">
-      <span class="nav-icon">🤖</span>
-      <span class="nav-label">IA CRM</span>
-    </div>
-    <div class="nav-item" onclick="navigate('settings')" id="nav-settings">
-      <span class="nav-icon">⚙️</span>
-      <span class="nav-label">Profil</span>
-    </div>
+  <!-- BOTTOM NAV -->
+  <nav class="glass" style="position:fixed;bottom:0;left:0;right:0;z-index:40;display:flex;border-top:1px solid var(--border);padding-bottom:var(--sab)">
+    <div class="bnav-item on" onclick="goPage('dash')"     id="nt-dash">    <div class="bnav-icon">📊</div><div class="bnav-label">Dashboard</div></div>
+    <div class="bnav-item"    onclick="goPage('contacts')" id="nt-contacts"><div class="bnav-icon">👥</div><div class="bnav-label">Contacts</div></div>
+    <div class="bnav-item"    onclick="goPage('pipe')"     id="nt-pipe">    <div class="bnav-icon">🔄</div><div class="bnav-label">Pipeline</div></div>
+    <div class="bnav-item"    onclick="goPage('hist')"     id="nt-hist">    <div class="bnav-icon">📞</div><div class="bnav-label">Historique</div></div>
+    <div class="bnav-item"    onclick="goPage('ai')"       id="nt-ai">      <div class="bnav-icon">🤖</div><div class="bnav-label">IA</div></div>
+    <div class="bnav-item"    onclick="goPage('voip')"     id="nt-voip">    <div class="bnav-icon">📡</div><div class="bnav-label">VOIP</div></div>
+    <div class="bnav-item"    onclick="goPage('settings')" id="nt-settings"><div class="bnav-icon">⚙️</div><div class="bnav-label">Profil</div></div>
   </nav>
-
-  <!-- FAB (Add Contact) -->
-  <button class="fab" onclick="openContactModal()" id="fab-btn">
-    <span>+</span>
-  </button>
-
+  <button class="fab" id="fab" onclick="openCModal()" style="display:none">＋</button>
 </div>
 
-<!-- ======== MODALS ======== -->
-
-<!-- Contact Detail Modal -->
-<div id="contact-modal" class="modal-overlay hidden">
-  <div class="modal-sheet">
-    <div class="modal-handle"></div>
-    <div class="flex items-center justify-between mb-4">
-      <h2 class="font-display font-bold text-xl" id="modal-contact-title">Nouveau Contact</h2>
-      <button onclick="closeContactModal()" class="btn-icon" style="background:rgba(255,255,255,0.06)">✕</button>
+<!-- ═══════ MODALS ═══════ -->
+<div id="m-contact" class="overlay" style="display:none">
+  <div class="sheet">
+    <div class="drag-pill"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+      <h2 class="ff" style="font-size:20px;font-weight:800" id="mc-title">Nouveau Contact</h2>
+      <button onclick="closeCModal()" class="btn-icon">✕</button>
     </div>
-
-    <div class="space-y-4" id="contact-form">
-      <div class="grid grid-cols-2 gap-3">
-        <div>
-          <label class="block text-xs font-semibold mb-2" style="color:var(--muted)">PRÉNOM</label>
-          <input id="f-prenom" type="text" placeholder="Jean" class="input-dark"/>
-        </div>
-        <div>
-          <label class="block text-xs font-semibold mb-2" style="color:var(--muted)">NOM</label>
-          <input id="f-nom" type="text" placeholder="Dupont" class="input-dark"/>
-        </div>
+    <div id="dup-email-warn" class="dup-warn" style="display:none">⚠️ Cet email existe déjà dans votre base</div>
+    <div id="dup-phone-warn" class="dup-warn" style="display:none">⚠️ Ce téléphone existe déjà dans votre base</div>
+    <div style="display:flex;flex-direction:column;gap:11px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div><label class="lbl">Prénom</label><input id="fp" type="text" autocomplete="off" placeholder="Jean" class="inp" oninput="checkDup()"/></div>
+        <div><label class="lbl">Nom</label><input id="fn" type="text" autocomplete="off" placeholder="Dupont" class="inp"/></div>
       </div>
-      <div>
-        <label class="block text-xs font-semibold mb-2" style="color:var(--muted)">EMAIL</label>
-        <input id="f-email" type="email" placeholder="jean@exemple.com" class="input-dark"/>
-      </div>
-      <div>
-        <label class="block text-xs font-semibold mb-2" style="color:var(--muted)">TÉLÉPHONE</label>
-        <input id="f-phone" type="tel" placeholder="+33 6 12 34 56 78" class="input-dark"/>
-      </div>
-      <div>
-        <label class="block text-xs font-semibold mb-2" style="color:var(--muted)">SOCIÉTÉ</label>
-        <input id="f-societe" type="text" placeholder="Acme Corp" class="input-dark"/>
-      </div>
-      <div>
-        <label class="block text-xs font-semibold mb-2" style="color:var(--muted)">STATUT</label>
-        <select id="f-status" class="input-dark">
-          <option value="lead">🔵 Lead</option>
-          <option value="prospect">🟡 Prospect</option>
-          <option value="rappel">🟠 À Rappeler</option>
-          <option value="client">🟢 Client</option>
+      <div><label class="lbl">Email</label><input id="fe" type="email" autocomplete="off" placeholder="jean@acme.com" class="inp" oninput="checkDup()"/></div>
+      <div><label class="lbl">Téléphone</label><input id="ft" type="tel" autocomplete="off" placeholder="+33 6 12 34 56 78" class="inp" oninput="checkDup()"/></div>
+      <div><label class="lbl">Société</label><input id="fs" type="text" autocomplete="off" placeholder="Acme Corp" class="inp"/></div>
+      <div><label class="lbl">Statut</label>
+        <select id="fst" class="inp">
+          <option value="lead">🔵 Lead</option><option value="prospect">🟡 Prospect</option>
+          <option value="rappel">🟠 À Rappeler</option><option value="client">🟢 Client</option>
           <option value="lost">🔴 Pas Intéressé</option>
         </select>
       </div>
-      <div>
-        <label class="block text-xs font-semibold mb-2" style="color:var(--muted)">NOTES / HISTORIQUE</label>
-        <textarea id="f-notes" placeholder="Notes sur ce contact..." class="input-dark" rows="3" style="resize:none;font-family:'DM Sans',sans-serif"></textarea>
+      <div><label class="lbl">Notes</label><textarea id="fno" class="inp" rows="3" placeholder="Notes…"></textarea></div>
+      <div><label class="lbl">CA Estimé (€)</label><input id="fca" type="number" min="0" step="100" placeholder="5000" class="inp"/></div>
+    </div>
+    <div id="mc-edit-btns" style="display:none;flex-direction:column;gap:8px;margin-top:14px">
+      <div style="display:flex;gap:8px">
+        <a id="mc-call" href="#" class="btn btn-ghost btn-sm" style="flex:1;text-decoration:none">📞 Appeler</a>
+        <a id="mc-wa"   href="#" class="btn btn-ghost btn-sm" style="flex:1;text-decoration:none">💚 WhatsApp</a>
+        <a id="mc-sms"  href="#" class="btn btn-ghost btn-sm" style="flex:1;text-decoration:none">💬 SMS</a>
       </div>
-      <div>
-        <label class="block text-xs font-semibold mb-2" style="color:var(--muted)">CA ESTIMÉ (€)</label>
-        <input id="f-ca" type="number" placeholder="5000" class="input-dark"/>
-      </div>
-
-      <!-- Action buttons in edit mode -->
-      <div id="contact-action-btns" class="hidden space-y-2">
-        <div class="flex gap-2">
-          <a id="btn-call" href="#" class="flex-1 btn-secondary text-center" style="text-decoration:none;display:flex;align-items:center;justify-content:center;gap:6px;padding:12px">
-            📞 Appeler
-          </a>
-          <a id="btn-wa" href="#" class="flex-1 btn-secondary text-center" style="text-decoration:none;display:flex;align-items:center;justify-content:center;gap:6px;padding:12px">
-            💚 WhatsApp
-          </a>
-        </div>
-        <button onclick="generateAIForContact()" class="btn-secondary" style="padding:12px">
-          🤖 Générer Message IA
-        </button>
-        <button onclick="logInteraction()" class="btn-secondary" style="padding:12px">
-          📝 Enregistrer Interaction
-        </button>
-      </div>
-
-      <div class="flex gap-3">
-        <button onclick="saveContact()" id="btn-save-contact" class="btn-primary flex-1">💾 Sauvegarder</button>
-        <button onclick="deleteContact()" id="btn-delete-contact" class="hidden btn-icon" style="background:rgba(255,107,71,0.2);border:1px solid rgba(255,107,71,0.3);color:#ff6b47;width:56px;height:56px;border-radius:14px;font-size:20px">🗑️</button>
+      <button onclick="openIntModal()" class="btn btn-ghost btn-sm">📝 Enregistrer Interaction</button>
+      <button onclick="genMsgForContact()" class="btn btn-ghost btn-sm">🤖 Message IA</button>
+    </div>
+    <div id="mc-ai-box" style="display:none;margin-top:12px" class="ai-box">
+      <div class="ff" style="font-size:10.5px;font-weight:700;color:#a5b4fc;letter-spacing:.5px;margin-bottom:8px">MESSAGE IA</div>
+      <div id="mc-ai-txt" style="font-size:13px;color:#c7d2fe;white-space:pre-wrap;line-height:1.6"></div>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button onclick="sendContactMsg('sms')"      class="btn btn-ghost btn-sm" style="flex:1">💬 SMS</button>
+        <button onclick="sendContactMsg('email')"    class="btn btn-ghost btn-sm" style="flex:1">📧 Email</button>
+        <button onclick="sendContactMsg('whatsapp')" class="btn btn-ghost btn-sm" style="flex:1">💚 WA</button>
       </div>
     </div>
-
-    <!-- AI Message mini result -->
-    <div id="modal-ai-result" class="hidden mt-4 ai-gradient">
-      <div class="text-xs font-bold mb-2" style="color:#818cf8">MESSAGE IA GÉNÉRÉ</div>
-      <div id="modal-ai-text" class="text-sm" style="color:#c7d2fe;white-space:pre-wrap"></div>
-      <div class="flex gap-2 mt-3">
-        <button onclick="sendModalMessage('sms')" class="btn-icon text-base" style="background:rgba(96,112,244,0.2);flex:1;width:auto;height:44px;border-radius:12px">💬 SMS</button>
-        <button onclick="sendModalMessage('email')" class="btn-icon text-base" style="background:rgba(110,245,106,0.2);flex:1;width:auto;height:44px;border-radius:12px">📧 Email</button>
-        <button onclick="sendModalMessage('whatsapp')" class="btn-icon text-base" style="background:rgba(37,211,102,0.2);flex:1;width:auto;height:44px;border-radius:12px">💚 WA</button>
-      </div>
+    <div style="display:flex;gap:10px;margin-top:16px">
+      <button onclick="saveC()" class="btn btn-primary" style="flex:1">💾 Sauvegarder</button>
+      <button onclick="deleteC()" id="mc-del" style="display:none;width:50px;padding:0" class="btn btn-danger">🗑️</button>
     </div>
   </div>
 </div>
 
-<!-- Profile Modal -->
-<div id="profile-modal" class="modal-overlay hidden">
-  <div class="modal-sheet">
-    <div class="modal-handle"></div>
-    <h2 class="font-display font-bold text-xl mb-4">Mon Profil</h2>
-    <div class="space-y-4">
-      <div class="flex items-center gap-4 p-4 rounded-2xl" style="background:rgba(255,255,255,0.04)">
-        <div class="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl" style="background:linear-gradient(135deg,rgba(96,112,244,0.3),rgba(110,245,106,0.2))">👤</div>
-        <div>
-          <div class="font-display font-bold" id="pm-name">—</div>
-          <div class="text-sm" style="color:var(--muted)" id="pm-email">—</div>
-          <div id="pm-role" class="mt-1"></div>
-        </div>
-      </div>
-      <button onclick="closeProfileModal();navigate('settings')" class="btn-secondary">⚙️ Paramètres</button>
-      <button onclick="signOut()" class="btn-secondary" style="border-color:rgba(255,107,71,0.3);color:#ff6b47">🚪 Déconnexion</button>
-      <button onclick="closeProfileModal()" class="btn-secondary">✕ Fermer</button>
-    </div>
-  </div>
-</div>
-
-<!-- Confirm Modal -->
-<div id="confirm-modal" class="modal-overlay hidden">
-  <div class="modal-sheet">
-    <div class="modal-handle"></div>
-    <div class="text-center py-4">
-      <div class="text-5xl mb-4" id="confirm-icon">⚠️</div>
-      <h2 class="font-display font-bold text-xl mb-2" id="confirm-title">Confirmation</h2>
-      <p class="text-sm mb-6" style="color:var(--muted)" id="confirm-text">Êtes-vous sûr ?</p>
-      <div class="flex gap-3">
-        <button onclick="closeConfirm()" class="btn-secondary flex-1">Annuler</button>
-        <button id="confirm-ok-btn" class="btn-primary flex-1" style="background:linear-gradient(135deg,#ef4444,#dc2626)">Confirmer</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Interaction Log Modal -->
-<div id="interaction-modal" class="modal-overlay hidden">
-  <div class="modal-sheet">
-    <div class="modal-handle"></div>
-    <h2 class="font-display font-bold text-xl mb-4">📝 Enregistrer Interaction</h2>
-    <div class="space-y-4">
-      <div>
-        <label class="block text-xs font-semibold mb-2" style="color:var(--muted)">TYPE</label>
-        <select id="int-type" class="input-dark">
-          <option value="appel">📞 Appel</option>
-          <option value="email">📧 Email</option>
-          <option value="rdv">🤝 RDV</option>
-          <option value="whatsapp">💚 WhatsApp</option>
-          <option value="note">📝 Note</option>
+<div id="m-int" class="overlay" style="display:none">
+  <div class="sheet">
+    <div class="drag-pill"></div>
+    <h2 class="ff" style="font-size:20px;font-weight:800;margin-bottom:18px">📝 Interaction</h2>
+    <div style="display:flex;flex-direction:column;gap:11px">
+      <div><label class="lbl">Type</label>
+        <select id="it" class="inp">
+          <option value="appel">📞 Appel</option><option value="email">📧 Email</option>
+          <option value="rdv">🤝 RDV</option><option value="whatsapp">💚 WhatsApp</option>
+          <option value="sms">💬 SMS</option><option value="note">📝 Note</option><option value="voip">📡 Appel VOIP</option>
         </select>
       </div>
-      <div>
-        <label class="block text-xs font-semibold mb-2" style="color:var(--muted)">RÉSULTAT</label>
-        <select id="int-result" class="input-dark">
-          <option value="positif">✅ Positif</option>
-          <option value="neutre">⚪ Neutre</option>
-          <option value="negatif">❌ Pas intéressé</option>
-          <option value="rappel">🔔 À rappeler</option>
-          <option value="vm">📱 Messagerie vocale</option>
+      <div><label class="lbl">Résultat</label>
+        <select id="ir" class="inp">
+          <option value="positif">✅ Positif</option><option value="neutre">⚪ Neutre</option>
+          <option value="rappel">🔔 À Rappeler</option><option value="negatif">❌ Pas intéressé</option>
+          <option value="vm">📱 Messagerie vocale</option><option value="occupe">🔴 Occupé</option><option value="absent">❓ Absent</option>
         </select>
       </div>
-      <div>
-        <label class="block text-xs font-semibold mb-2" style="color:var(--muted)">NOTES</label>
-        <textarea id="int-notes" placeholder="Détails de l'interaction..." class="input-dark" rows="3" style="resize:none;font-family:'DM Sans',sans-serif"></textarea>
+      <div><label class="lbl">Notes</label><textarea id="in-notes" class="inp" rows="3" placeholder="Détails…"></textarea></div>
+      <div><label class="lbl">Date de rappel</label><input id="ird" type="date" class="inp"/></div>
+      <button onclick="saveInt()" class="btn btn-primary">💾 Enregistrer</button>
+      <button onclick="closeInt()" class="btn btn-ghost btn-sm">Annuler</button>
+    </div>
+  </div>
+</div>
+
+<div id="m-confirm" class="overlay" style="display:none">
+  <div class="sheet" style="text-align:center">
+    <div class="drag-pill"></div>
+    <div id="conf-ico" style="font-size:52px;margin-bottom:14px">⚠️</div>
+    <h2 class="ff" style="font-size:20px;font-weight:800;margin-bottom:8px" id="conf-title">Confirmation</h2>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.5" id="conf-txt">Êtes-vous sûr ?</p>
+    <div style="display:flex;gap:10px">
+      <button onclick="closeConfirm()" class="btn btn-ghost" style="flex:1">Annuler</button>
+      <button id="conf-ok" class="btn" style="flex:1;background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff">Confirmer</button>
+    </div>
+  </div>
+</div>
+
+<div id="m-profile" class="overlay" style="display:none">
+  <div class="sheet">
+    <div class="drag-pill"></div>
+    <h2 class="ff" style="font-size:20px;font-weight:800;margin-bottom:18px">Mon Profil</h2>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div class="glass-card" style="padding:14px;display:flex;align-items:center;gap:14px">
+        <div style="width:54px;height:54px;border-radius:16px;background:linear-gradient(135deg,rgba(99,102,241,.35),rgba(132,204,22,.2));display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">👤</div>
+        <div><div class="ff" style="font-size:15px;font-weight:800" id="pm-name">—</div><div style="font-size:12.5px;color:var(--muted);margin-top:2px" id="pm-email">—</div><div style="margin-top:6px" id="pm-role"></div></div>
       </div>
-      <div>
-        <label class="block text-xs font-semibold mb-2" style="color:var(--muted)">DATE DE RAPPEL</label>
-        <input id="int-rappel" type="date" class="input-dark"/>
+      <button onclick="closeProfile();goPage('settings')" class="btn btn-ghost btn-sm">⚙️ Paramètres</button>
+      <button onclick="doSignOut()" class="btn btn-danger btn-sm">🚪 Déconnexion</button>
+      <button onclick="closeProfile()" class="btn btn-ghost btn-sm">✕ Fermer</button>
+    </div>
+  </div>
+</div>
+
+<!-- PATCH 6: Debug Panel (temporaire - production) -->
+<div id="debug-panel" style="display:none;position:fixed;bottom:calc(80px + var(--sab));left:10px;z-index:999;background:rgba(0,0,0,.92);border:1px solid rgba(99,102,241,.5);border-radius:14px;padding:12px 14px;font-size:11px;font-family:monospace;max-width:280px;max-height:220px;overflow-y:auto;color:#bef264">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+    <span style="color:#a5b4fc;font-weight:700;font-size:12px">🐛 Debug NexCRM</span>
+    <button onclick="$('debug-panel').style.display='none'" style="background:none;border:none;color:#64748b;cursor:pointer;font-size:14px">✕</button>
+  </div>
+  <div id="dbg-session"  style="margin-bottom:3px">Session: <span style="color:#fcd34d">—</span></div>
+  <div id="dbg-online"   style="margin-bottom:3px">Réseau: <span style="color:#fcd34d">—</span></div>
+  <div id="dbg-contacts" style="margin-bottom:3px">Contacts: <span style="color:#fcd34d">—</span></div>
+  <div id="dbg-pending"  style="margin-bottom:3px">Pending: <span style="color:#fcd34d">—</span></div>
+  <div id="dbg-import"   style="margin-bottom:3px">Import: <span style="color:#fcd34d">—</span></div>
+  <div id="dbg-last-err" style="color:#fb7185">Erreur: <span>—</span></div>
+  <button onclick="refreshDebug()" style="background:rgba(99,102,241,.3);border:none;color:#a5b4fc;padding:3px 8px;border-radius:6px;cursor:pointer;margin-top:6px;width:100%;font-size:10px">🔄 Rafraîchir</button>
+</div>
+<!-- Bouton debug trigger (triple tap sur le header) -->
+
+<!-- PATCH: Import Progress Modal -->
+<div id="m-import-prog" class="overlay" style="display:none">
+  <div class="sheet" style="max-height:55vh">
+    <div class="drag-pill"></div>
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="font-size:36px;margin-bottom:10px" id="imp-icon">📂</div>
+      <h2 class="ff" style="font-size:19px;font-weight:800" id="imp-modal-title">Import en cours...</h2>
+      <p style="font-size:12.5px;color:var(--muted);margin-top:5px" id="imp-modal-sub">Traitement du fichier</p>
+    </div>
+    <!-- Progress bar -->
+    <div style="margin-bottom:18px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:7px">
+        <span style="font-size:12px;color:var(--muted2)" id="imp-prog-label">Préparation...</span>
+        <span style="font-size:12px;font-weight:700;color:var(--accent)" id="imp-prog-pct">0%</span>
       </div>
-      <button onclick="saveInteraction()" class="btn-primary">💾 Enregistrer</button>
-      <button onclick="closeInteraction()" class="btn-secondary">Annuler</button>
+      <div class="prog" style="height:8px;border-radius:4px">
+        <div id="imp-prog-bar" class="prog-bar" style="width:0%;transition:width .4s ease"></div>
+      </div>
+    </div>
+    <!-- Stats cards -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px" id="imp-stats">
+      <div class="glass-card" style="padding:10px;text-align:center">
+        <div class="ff" style="font-size:22px;font-weight:900;color:#a5b4fc" id="imp-stat-detected">0</div>
+        <div style="font-size:10px;color:var(--muted)">Détectés</div>
+      </div>
+      <div class="glass-card" style="padding:10px;text-align:center">
+        <div class="ff" style="font-size:22px;font-weight:900;color:#bef264" id="imp-stat-inserted">0</div>
+        <div style="font-size:10px;color:var(--muted)">Insérés</div>
+      </div>
+      <div class="glass-card" style="padding:10px;text-align:center">
+        <div class="ff" style="font-size:22px;font-weight:900;color:#fcd34d" id="imp-stat-skipped">0</div>
+        <div style="font-size:10px;color:var(--muted)">Ignorés</div>
+      </div>
+    </div>
+    <!-- Done button (hidden until complete) -->
+    <button id="imp-done-btn" onclick="closeModal('m-import-prog')" class="btn btn-primary" style="display:none">
+      ✅ Voir mes contacts
+    </button>
+    <!-- Cancel (shown during progress) -->
+    <div id="imp-spinner" style="text-align:center;padding:8px">
+      <div class="spinner"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PATCH: Reset Password Modal -->
+<div id="m-reset-pass" class="overlay" style="display:none">
+  <div class="sheet" style="max-height:60vh">
+    <div class="drag-pill"></div>
+    <div style="text-align:center;margin-bottom:18px">
+      <div style="font-size:40px;margin-bottom:8px">🔐</div>
+      <h2 class="ff" style="font-size:20px;font-weight:800">Nouveau mot de passe</h2>
+      <p style="font-size:12.5px;color:var(--muted);margin-top:4px">Choisissez un mot de passe sécurisé</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div><label class="lbl">Nouveau mot de passe</label><input id="reset-pass1" type="password" autocomplete="new-password" placeholder="Min. 6 caractères" class="inp"/></div>
+      <div><label class="lbl">Confirmer le mot de passe</label><input id="reset-pass2" type="password" autocomplete="new-password" placeholder="Répétez le mot de passe" class="inp"/></div>
+      <button id="btn-reset-pass" onclick="doResetPassword()" class="btn btn-primary">🔐 Mettre à jour le mot de passe</button>
+      <button onclick="closeModal('m-reset-pass')" class="btn btn-ghost btn-sm">Annuler</button>
     </div>
   </div>
 </div>
 
 <script>
-// ============================================================
-// SUPABASE CONFIG
-// ============================================================
-const SUPABASE_URL = 'https://tkikhtpzpixzscpkewlh.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_or9nFB9PectQNg5BFtTrAQ_UuX_tBB2';
-const ADMIN_EMAIL  = 'elaidi.aziz10.if@gmail.com';
+'use strict';
+const SB_URL    = 'https://tkikhtpzpixzscpkewlh.supabase.co';
+const SB_KEY    = 'sb_publishable_or9nFB9PectQNg5BFtTrAQ_UuX_tBB2';
+const ADM_EMAIL = 'elaidi.aziz10.if@gmail.com';
+const PAGE_SIZE = 30;
 
-const { createClient } = supabase;
-const db = createClient(SUPABASE_URL, SUPABASE_KEY);
-
-// ============================================================
-// STATE
-// ============================================================
-let currentUser   = null;
-let userProfile   = null;
-let isAdmin       = false;
-let allContacts   = [];
-let filteredContacts = [];
-let currentFilter = 'all';
-let editingContactId = null;
-let pendingSync   = [];
-let isOnline      = navigator.onLine;
-let charts        = {};
-let currentPage   = 'dashboard';
-let modalAIContact = null;
-let confirmCallback = null;
-
-// ============================================================
-// INIT
-// ============================================================
-async function init() {
-  await initSupabaseTables();
-
-  const { data:{ session } } = await db.auth.getSession();
-  if (session?.user) {
-    currentUser = session.user;
-    await loadUserProfile();
-    showApp();
-  } else {
-    showAuth();
+// ── Supabase ──────────────────────────────────
+const sb = window.supabase.createClient(SB_URL, SB_KEY, {
+  auth:{
+    persistSession:    true,
+    autoRefreshToken:  true,
+    detectSessionInUrl:true, // CRITICAL: détecte les tokens dans l'URL hash (recovery, confirmation)
+    storageKey:        'nexcrm-auth', // clé localStorage unique pour cette app
+    // IMPORTANT Supabase Dashboard → Auth → URL Configuration:
+    // Site URL   : https://votre-domaine.vercel.app
+    // Redirect   : https://votre-domaine.vercel.app/**
+    // Sans cette config, les emails pointent vers l'URL par défaut Supabase (non votre app)
   }
-
-  db.auth.onAuthStateChange(async (event, session) => {
-    if (event === 'SIGNED_IN' && session?.user) {
-      currentUser = session.user;
-      await loadUserProfile();
-      showApp();
-    } else if (event === 'SIGNED_OUT') {
-      showAuth();
-    }
-  });
-
-  // Offline detection
-  window.addEventListener('online',  () => { isOnline = true;  updateOfflineBanner(); syncPending(); });
-  window.addEventListener('offline', () => { isOnline = false; updateOfflineBanner(); });
-  updateOfflineBanner();
-
-  // Service Worker for PWA
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('data:application/javascript;charset=utf-8,' + encodeURIComponent(`
-      self.addEventListener('install', e => self.skipWaiting());
-      self.addEventListener('activate', e => clients.claim());
-      self.addEventListener('fetch', e => e.respondWith(
-        caches.match(e.request).then(r => r || fetch(e.request).catch(() => new Response('', {status: 503})))
-      ));
-    `)).catch(()=>{});
-  }
-
-  // Load pending from localStorage
-  const pending = localStorage.getItem('nexcrm_pending');
-  if (pending) pendingSync = JSON.parse(pending);
-}
-
-async function initSupabaseTables() {
-  // contacts table auto-created via Supabase dashboard
-  // interactions table auto-created via Supabase dashboard
-  // profiles table auto-created via Supabase dashboard
-  // We rely on the tables existing; graceful error handling below
-}
-
-// ============================================================
-// AUTH
-// ============================================================
-function switchAuthTab(tab) {
-  const isSign = tab === 'signin';
-  document.getElementById('form-signin').classList.toggle('hidden', !isSign);
-  document.getElementById('form-signup').classList.toggle('hidden',  isSign);
-  document.getElementById('tab-signin').style.cssText = isSign ? 'background:var(--accent);color:white' : 'color:var(--muted)';
-  document.getElementById('tab-signup').style.cssText = !isSign ? 'background:var(--accent);color:white' : 'color:var(--muted)';
-  clearAuthError();
-}
-
-function showAuthError(msg) {
-  const el = document.getElementById('auth-error');
-  el.textContent = msg;
-  el.classList.remove('hidden');
-}
-function clearAuthError() {
-  document.getElementById('auth-error').classList.add('hidden');
-}
-
-async function signIn() {
-  const email = document.getElementById('signin-email').value.trim();
-  const pass  = document.getElementById('signin-password').value;
-  if (!email || !pass) return showAuthError('Veuillez remplir tous les champs');
-
-  const btn = document.getElementById('btn-signin');
-  const txt = document.getElementById('signin-text');
-  btn.disabled = true; txt.innerHTML = '<span class="loader"></span>';
-
-  const { data, error } = await db.auth.signInWithPassword({ email, password: pass });
-
-  btn.disabled = false; txt.textContent = 'Se connecter';
-  if (error) showAuthError(error.message);
-}
-
-async function signUp() {
-  const name  = document.getElementById('signup-name').value.trim();
-  const email = document.getElementById('signup-email').value.trim();
-  const pass  = document.getElementById('signup-password').value;
-
-  if (!name || !email || !pass) return showAuthError('Veuillez remplir tous les champs');
-  if (pass.length < 6) return showAuthError('Le mot de passe doit faire au moins 6 caractères');
-
-  const btn = document.getElementById('btn-signup');
-  const txt = document.getElementById('signup-text');
-  btn.disabled = true; txt.innerHTML = '<span class="loader"></span>';
-
-  const { data, error } = await db.auth.signUp({ email, password: pass, options: { data: { full_name: name } } });
-
-  btn.disabled = false; txt.textContent = 'Créer mon compte';
-
-  if (error) { showAuthError(error.message); return; }
-
-  if (data.user) {
-    // Create profile
-    await db.from('profiles').upsert({
-      id: data.user.id,
-      email: email,
-      full_name: name,
-      role: email === ADMIN_EMAIL ? 'admin' : 'user',
-      created_at: new Date().toISOString()
-    });
-    showNotif('✅ Compte créé ! Vérifiez vos emails.', 'success');
-    switchAuthTab('signin');
-  }
-}
-
-async function signOut() {
-  await db.auth.signOut();
-  currentUser = null; userProfile = null; isAdmin = false;
-  allContacts = []; filteredContacts = [];
-  closeProfileModal();
-  showAuth();
-}
-
-async function loadUserProfile() {
-  isAdmin = currentUser.email === ADMIN_EMAIL;
-
-  const { data } = await db.from('profiles').select('*').eq('id', currentUser.id).single();
-  if (data) {
-    userProfile = data;
-  } else {
-    userProfile = {
-      id: currentUser.id,
-      email: currentUser.email,
-      full_name: currentUser.user_metadata?.full_name || currentUser.email,
-      role: isAdmin ? 'admin' : 'user'
-    };
-    await db.from('profiles').upsert(userProfile);
-  }
-  if (currentUser.email === ADMIN_EMAIL) { isAdmin = true; userProfile.role = 'admin'; }
-}
-
-// ============================================================
-// UI TRANSITIONS
-// ============================================================
-function showAuth() {
-  document.getElementById('auth-screen').classList.remove('hidden');
-  document.getElementById('main-app').classList.add('hidden');
-}
-
-function showApp() {
-  document.getElementById('auth-screen').classList.add('hidden');
-  document.getElementById('main-app').classList.remove('hidden');
-  setupUI();
-  loadContacts();
-}
-
-function setupUI() {
-  // Profile info
-  const name  = userProfile?.full_name || currentUser.email;
-  const email = currentUser.email;
-  const role  = isAdmin ? 'admin' : 'user';
-  const roleBadge = isAdmin ? '<span class="badge badge-admin">⚡ Admin</span>' : '<span class="badge badge-lead">Utilisateur</span>';
-
-  ['profile-name','pm-name'].forEach(id => { const el = document.getElementById(id); if(el) el.textContent = name; });
-  ['profile-email','pm-email'].forEach(id => { const el = document.getElementById(id); if(el) el.textContent = email; });
-  ['profile-role','pm-role'].forEach(id => { const el = document.getElementById(id); if(el) el.innerHTML = roleBadge; });
-  document.getElementById('user-avatar').textContent = isAdmin ? '⚡' : '👤';
-
-  // Admin sections
-  document.getElementById('admin-section').classList.toggle('hidden', !isAdmin);
-  document.getElementById('admin-users-section').classList.toggle('hidden', !isAdmin);
-
-  // Schedule reminders check
-  setTimeout(checkReminders, 3000);
-}
-
-function navigate(page) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById('page-' + page).classList.add('active');
-  document.getElementById('nav-' + page)?.classList.add('active');
-
-  currentPage = page;
-
-  const titles = {
-    dashboard: ['Dashboard', 'Vue d\'ensemble'],
-    contacts:  ['Contacts', allContacts.length + ' contacts'],
-    pipeline:  ['Pipeline', 'Suivi commercial'],
-    history:   ['Historique', 'Interactions'],
-    ai:        ['IA CRM', 'Intelligence artificielle'],
-    settings:  ['Profil', isAdmin ? 'Administrateur' : 'Utilisateur']
-  };
-  const [title, sub] = titles[page] || ['NexCRM', ''];
-  document.getElementById('header-title').textContent = title;
-  document.getElementById('header-sub').textContent = sub;
-
-  // Page-specific loads
-  if (page === 'dashboard') renderDashboard();
-  if (page === 'pipeline')  renderPipeline();
-  if (page === 'history')   loadHistory();
-  if (page === 'ai')        { renderHotProspects(); populateAISelect(); }
-  if (page === 'settings' && isAdmin) loadUsers();
-}
-
-// ============================================================
-// OFFLINE
-// ============================================================
-function updateOfflineBanner() {
-  document.getElementById('offline-banner').classList.toggle('hidden', isOnline);
-}
-
-async function syncPending() {
-  if (!pendingSync.length) return;
-  document.getElementById('sync-indicator').classList.remove('hidden');
-
-  for (const op of [...pendingSync]) {
-    try {
-      if (op.type === 'upsert') {
-        await db.from('contacts').upsert(op.data);
-      } else if (op.type === 'delete') {
-        await db.from('contacts').delete().eq('id', op.id);
-      }
-      pendingSync = pendingSync.filter(p => p !== op);
-    } catch(e) {}
-  }
-
-  localStorage.setItem('nexcrm_pending', JSON.stringify(pendingSync));
-  document.getElementById('sync-indicator').classList.add('hidden');
-  if (!pendingSync.length) { showNotif('✅ Synchronisation réussie !', 'success'); loadContacts(); }
-}
-
-function addPending(op) {
-  pendingSync.push(op);
-  localStorage.setItem('nexcrm_pending', JSON.stringify(pendingSync));
-}
-
-// ============================================================
-// CONTACTS — LOAD
-// ============================================================
-async function loadContacts() {
-  document.getElementById('contacts-loading').classList.remove('hidden');
-  document.getElementById('contacts-list').innerHTML = '';
-  document.getElementById('contacts-empty').classList.add('hidden');
-
-  let query = db.from('contacts').select('*').order('created_at', { ascending: false });
-  if (!isAdmin) query = query.eq('user_id', currentUser.id);
-
-  const { data, error } = await query;
-  document.getElementById('contacts-loading').classList.add('hidden');
-
-  if (error) {
-    // Try local cache
-    const cached = localStorage.getItem('nexcrm_contacts');
-    allContacts = cached ? JSON.parse(cached) : [];
-    showNotif('⚠️ Mode hors-ligne — données locales', 'warning');
-  } else {
-    allContacts = data || [];
-    localStorage.setItem('nexcrm_contacts', JSON.stringify(allContacts));
-  }
-
-  filteredContacts = [...allContacts];
-  renderContacts();
-  renderDashboard();
-
-  document.getElementById('header-sub').textContent = allContacts.length + ' contacts';
-  document.getElementById('contacts-empty').classList.toggle('hidden', allContacts.length > 0);
-  document.getElementById('swipe-hint')?.classList.toggle('hidden', allContacts.length === 0);
-}
-
-// ============================================================
-// CONTACTS — RENDER
-// ============================================================
-function renderContacts() {
-  const list = document.getElementById('contacts-list');
-  list.innerHTML = '';
-
-  const toRender = filteredContacts;
-  if (!toRender.length) {
-    document.getElementById('contacts-empty').classList.remove('hidden');
-    return;
-  }
-  document.getElementById('contacts-empty').classList.add('hidden');
-
-  toRender.forEach((c, i) => {
-    const div = document.createElement('div');
-    div.className = 'contact-card animate-slide-up';
-    div.style.animationDelay = (i * 0.03) + 's';
-    div.innerHTML = `
-      <div class="flex items-center gap-3">
-        <div class="w-11 h-11 rounded-xl flex items-center justify-center text-lg flex-shrink-0" style="background:${statusColor(c.status)}">${statusEmoji(c.status)}</div>
-        <div class="flex-1 min-w-0">
-          <div class="font-display font-semibold truncate">${c.prenom || ''} ${c.nom || ''}</div>
-          <div class="text-xs truncate" style="color:var(--muted)">${c.societe || c.email || '—'}</div>
-        </div>
-        <span class="badge ${statusBadgeClass(c.status)} flex-shrink-0">${statusLabel(c.status)}</span>
-      </div>
-      ${c.phone ? `<div class="mt-2 text-xs" style="color:var(--muted)">📞 ${c.phone}</div>` : ''}
-    `;
-    div.onclick = () => openContactModal(c);
-    list.appendChild(div);
-  });
-}
-
-function filterContacts() {
-  const q = document.getElementById('search-input').value.toLowerCase();
-  filteredContacts = allContacts.filter(c => {
-    const matchStatus = currentFilter === 'all' || c.status === currentFilter;
-    const matchSearch = !q || `${c.prenom} ${c.nom} ${c.email} ${c.societe} ${c.phone}`.toLowerCase().includes(q);
-    return matchStatus && matchSearch;
-  });
-  renderContacts();
-}
-
-function filterByStatus(status, btn) {
-  currentFilter = status;
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  filterContacts();
-}
-
-// ============================================================
-// CONTACT MODAL
-// ============================================================
-function openContactModal(contact = null) {
-  editingContactId = contact?.id || null;
-  const modal = document.getElementById('contact-modal');
-  modal.classList.remove('hidden');
-  document.body.style.overflow = 'hidden';
-
-  document.getElementById('modal-contact-title').textContent = contact ? `${contact.prenom || ''} ${contact.nom || ''}`.trim() || 'Fiche Contact' : 'Nouveau Contact';
-  document.getElementById('f-prenom').value   = contact?.prenom   || '';
-  document.getElementById('f-nom').value      = contact?.nom      || '';
-  document.getElementById('f-email').value    = contact?.email    || '';
-  document.getElementById('f-phone').value    = contact?.phone    || '';
-  document.getElementById('f-societe').value  = contact?.societe  || '';
-  document.getElementById('f-status').value   = contact?.status   || 'lead';
-  document.getElementById('f-notes').value    = contact?.notes    || '';
-  document.getElementById('f-ca').value       = contact?.ca_estime || '';
-
-  const isEdit = !!contact;
-  document.getElementById('contact-action-btns').classList.toggle('hidden', !isEdit);
-  document.getElementById('btn-delete-contact').classList.toggle('hidden', !isEdit || !isAdmin);
-  document.getElementById('modal-ai-result').classList.add('hidden');
-
-  if (isEdit && contact.phone) {
-    document.getElementById('btn-call').href = 'tel:' + contact.phone;
-    document.getElementById('btn-wa').href   = 'https://wa.me/' + contact.phone.replace(/\D/g,'');
-  }
-
-  modalAIContact = contact;
-}
-
-function closeContactModal() {
-  document.getElementById('contact-modal').classList.add('hidden');
-  document.body.style.overflow = '';
-  editingContactId = null;
-  modalAIContact = null;
-}
-
-async function saveContact() {
-  const contact = {
-    prenom:    document.getElementById('f-prenom').value.trim(),
-    nom:       document.getElementById('f-nom').value.trim(),
-    email:     document.getElementById('f-email').value.trim(),
-    phone:     document.getElementById('f-phone').value.trim(),
-    societe:   document.getElementById('f-societe').value.trim(),
-    status:    document.getElementById('f-status').value,
-    notes:     document.getElementById('f-notes').value.trim(),
-    ca_estime: parseFloat(document.getElementById('f-ca').value) || 0,
-    user_id:   currentUser.id,
-    updated_at: new Date().toISOString()
-  };
-
-  if (!contact.prenom && !contact.nom && !contact.email) {
-    showNotif('⚠️ Veuillez remplir au moins le nom ou l\'email', 'warning');
-    return;
-  }
-
-  const btn = document.getElementById('btn-save-contact');
-  btn.disabled = true; btn.textContent = '⏳ Sauvegarde...';
-
-  if (editingContactId) {
-    contact.id = editingContactId;
-  } else {
-    contact.created_at = new Date().toISOString();
-  }
-
-  if (isOnline) {
-    const { data, error } = await db.from('contacts').upsert(contact).select().single();
-    if (error) {
-      addPending({ type: 'upsert', data: contact });
-      showNotif('📱 Sauvegardé localement', 'warning');
-    } else {
-      showNotif('✅ Contact sauvegardé !', 'success');
-      if (editingContactId) {
-        const idx = allContacts.findIndex(c => c.id === editingContactId);
-        if (idx >= 0) allContacts[idx] = data;
-      } else {
-        allContacts.unshift(data);
-      }
-    }
-  } else {
-    contact.id = contact.id || 'local_' + Date.now();
-    addPending({ type: 'upsert', data: contact });
-    if (editingContactId) {
-      const idx = allContacts.findIndex(c => c.id === editingContactId);
-      if (idx >= 0) allContacts[idx] = contact;
-    } else {
-      allContacts.unshift(contact);
-    }
-    showNotif('📱 Sauvegardé localement (hors-ligne)', 'warning');
-  }
-
-  btn.disabled = false; btn.textContent = '💾 Sauvegarder';
-  filteredContacts = [...allContacts];
-  filterContacts();
-  renderDashboard();
-  closeContactModal();
-}
-
-async function deleteContact() {
-  if (!editingContactId) return;
-  if (!isAdmin) { showNotif('❌ Action réservée aux administrateurs', 'error'); return; }
-
-  showConfirm('🗑️ Supprimer ce contact ?', 'Cette action est irréversible.', async () => {
-    const { error } = await db.from('contacts').delete().eq('id', editingContactId);
-    if (!error) {
-      allContacts = allContacts.filter(c => c.id !== editingContactId);
-      filteredContacts = [...allContacts];
-      filterContacts();
-      renderDashboard();
-      closeContactModal();
-      showNotif('🗑️ Contact supprimé', 'success');
-    }
-  });
-}
-
-// ============================================================
-// INTERACTIONS
-// ============================================================
-function logInteraction() {
-  document.getElementById('interaction-modal').classList.remove('hidden');
-  document.body.style.overflow = 'hidden';
-  // Set today's date + 7 days as default rappel
-  const next = new Date(); next.setDate(next.getDate() + 7);
-  document.getElementById('int-rappel').value = next.toISOString().split('T')[0];
-}
-
-function closeInteraction() {
-  document.getElementById('interaction-modal').classList.add('hidden');
-  document.body.style.overflow = '';
-}
-
-async function saveInteraction() {
-  if (!editingContactId) { showNotif('⚠️ Ouvrez d\'abord une fiche contact', 'warning'); return; }
-
-  const interaction = {
-    contact_id:   editingContactId,
-    user_id:      currentUser.id,
-    type:         document.getElementById('int-type').value,
-    result:       document.getElementById('int-result').value,
-    notes:        document.getElementById('int-notes').value,
-    rappel_date:  document.getElementById('int-rappel').value || null,
-    created_at:   new Date().toISOString()
-  };
-
-  const { error } = await db.from('interactions').insert(interaction);
-  if (error) {
-    addPending({ type: 'interaction', data: interaction });
-    showNotif('📱 Interaction sauvegardée localement', 'warning');
-  } else {
-    showNotif('✅ Interaction enregistrée !', 'success');
-  }
-
-  // Update contact status if result suggests it
-  if (interaction.result === 'rappel') {
-    await db.from('contacts').update({ status: 'rappel', updated_at: new Date().toISOString() }).eq('id', editingContactId);
-    const c = allContacts.find(x => x.id === editingContactId);
-    if (c) c.status = 'rappel';
-    filterContacts();
-  }
-
-  closeInteraction();
-}
-
-async function loadHistory() {
-  let query = db.from('interactions').select('*, contacts(prenom, nom, societe)').order('created_at', { ascending: false }).limit(50);
-  if (!isAdmin) query = query.eq('user_id', currentUser.id);
-
-  const { data, error } = await query;
-  const list = document.getElementById('history-list');
-  const empty = document.getElementById('history-empty');
-
-  if (error || !data?.length) {
-    list.innerHTML = ''; empty.classList.remove('hidden'); return;
-  }
-  empty.classList.add('hidden');
-  list.innerHTML = '';
-
-  data.forEach((int, i) => {
-    const c = int.contacts;
-    const div = document.createElement('div');
-    div.className = 'stat-card animate-slide-up';
-    div.style.animationDelay = (i * 0.04) + 's';
-    div.innerHTML = `
-      <div class="flex items-center justify-between mb-2">
-        <div class="flex items-center gap-2">
-          <span class="text-xl">${typeEmoji(int.type)}</span>
-          <div>
-            <div class="font-display font-semibold text-sm">${c ? (c.prenom||'') + ' ' + (c.nom||'') : 'Contact supprimé'}</div>
-            <div class="text-xs" style="color:var(--muted)">${c?.societe || ''}</div>
-          </div>
-        </div>
-        <span class="badge ${resultBadge(int.result)}">${int.result}</span>
-      </div>
-      ${int.notes ? `<div class="text-xs p-2 rounded-lg" style="background:rgba(255,255,255,0.04);color:#94a3b8">${int.notes}</div>` : ''}
-      <div class="flex justify-between mt-2">
-        <span class="text-xs" style="color:var(--muted)">${formatDate(int.created_at)}</span>
-        ${int.rappel_date ? `<span class="text-xs" style="color:#fb923c">🔔 ${int.rappel_date}</span>` : ''}
-      </div>
-    `;
-    list.appendChild(div);
-  });
-}
-
-// ============================================================
-// DASHBOARD
-// ============================================================
-function renderDashboard() {
-  const total    = allContacts.length;
-  const clients  = allContacts.filter(c => c.status === 'client').length;
-  const conv     = total ? Math.round((clients/total)*100) : 0;
-  const ca       = allContacts.reduce((s,c) => s + (c.ca_estime||0), 0);
-  const rappels  = allContacts.filter(c => c.status === 'rappel');
-
-  document.getElementById('kpi-leads').textContent   = total;
-  document.getElementById('kpi-clients').textContent = clients;
-  document.getElementById('kpi-conv').textContent    = conv + '%';
-  document.getElementById('kpi-ca').textContent      = ca >= 1000 ? (ca/1000).toFixed(1) + 'k€' : ca + '€';
-
-  // Rappels
-  const rl = document.getElementById('rappels-list');
-  document.getElementById('rappels-count').textContent = rappels.length;
-  rl.innerHTML = rappels.slice(0,5).map(c => `
-    <div class="flex items-center justify-between p-3 rounded-xl" style="background:rgba(251,146,60,0.1);border:1px solid rgba(251,146,60,0.2)" onclick='openContactModal(${JSON.stringify(c).replace(/'/g,"\\'")})''>
-      <div>
-        <div class="font-display font-semibold text-sm">${c.prenom||''} ${c.nom||''}</div>
-        <div class="text-xs" style="color:var(--muted)">${c.societe||c.phone||'—'}</div>
-      </div>
-      <span style="font-size:20px">📞</span>
-    </div>
-  `).join('');
-
-  renderPipelineChart();
-  renderActivityChart();
-  renderAISuggestion();
-}
-
-function renderPipelineChart() {
-  const ctx = document.getElementById('chart-pipeline');
-  if (!ctx) return;
-  if (charts.pipeline) charts.pipeline.destroy();
-
-  const statuses = ['lead','prospect','rappel','client','lost'];
-  const labels   = ['Lead','Prospect','À Rappeler','Client','Perdu'];
-  const counts   = statuses.map(s => allContacts.filter(c => c.status === s).length);
-  const colors   = ['#6070f4','#fbbf24','#fb923c','#6ef56a','#ff6b47'];
-
-  charts.pipeline = new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-      labels,
-      datasets: [{ data: counts, backgroundColor: colors.map(c => c + '99'), borderColor: colors, borderWidth: 2 }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: {
-        legend: { position: 'right', labels: { color: '#94a3b8', font: { size: 11 }, boxWidth: 12 } }
-      },
-      cutout: '65%'
-    }
-  });
-}
-
-function renderActivityChart() {
-  const ctx = document.getElementById('chart-activity');
-  if (!ctx) return;
-  if (charts.activity) charts.activity.destroy();
-
-  const days = [];
-  const data = [];
-  for (let i = 6; i >= 0; i--) {
-    const d = new Date(); d.setDate(d.getDate() - i);
-    days.push(d.toLocaleDateString('fr', { weekday: 'short' }));
-    const dayStr = d.toISOString().split('T')[0];
-    data.push(allContacts.filter(c => c.created_at?.startsWith(dayStr) || c.updated_at?.startsWith(dayStr)).length);
-  }
-
-  charts.activity = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: days,
-      datasets: [{
-        label: 'Activité',
-        data,
-        backgroundColor: 'rgba(96,112,244,0.4)',
-        borderColor: '#6070f4',
-        borderWidth: 2,
-        borderRadius: 8
-      }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#64748b' } },
-        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#64748b', stepSize: 1 } }
-      }
-    }
-  });
-}
-
-function renderAISuggestion() {
-  const hot = allContacts
-    .filter(c => c.status === 'rappel' || c.status === 'prospect')
-    .sort((a,b) => new Date(b.updated_at||0) - new Date(a.updated_at||0))[0];
-
-  const el = document.getElementById('ai-suggestion');
-  if (!hot) {
-    el.textContent = '✅ Tous vos prospects sont à jour. Ajoutez de nouveaux contacts pour continuer à prospecter.';
-    return;
-  }
-
-  el.innerHTML = `
-    <div class="font-semibold mb-1" style="color:#a5b4fc">🎯 ${hot.prenom||''} ${hot.nom||''} — ${hot.societe||'Contact'}</div>
-    <div style="color:#94a3b8;font-size:12px">Statut : ${statusLabel(hot.status)} • Dernière activité : ${formatDate(hot.updated_at)}</div>
-    <div class="mt-2" style="color:#c7d2fe;font-size:13px">Ce contact est prioritaire pour votre prochaine relance. Taux de conversion moyen après relance : <strong style="color:#6ef56a">+34%</strong>.</div>
-    <div class="flex gap-2 mt-3">
-      ${hot.phone ? `<a href="tel:${hot.phone}" class="btn-secondary text-center" style="text-decoration:none;display:inline-block;padding:8px 12px;font-size:13px;flex:1">📞 Appeler</a>` : ''}
-      <button onclick='openContactModal(${JSON.stringify(hot).replace(/'/g,"\\'")})' class="btn-secondary" style="padding:8px 12px;font-size:13px;flex:1">👁️ Fiche</button>
-    </div>
-  `;
-}
-
-// ============================================================
-// PIPELINE BOARD
-// ============================================================
-function renderPipeline() {
-  const board = document.getElementById('pipeline-board');
-  board.innerHTML = '';
-
-  const stages = [
-    { key: 'lead',     label: '🔵 Lead',        color: '#6070f4' },
-    { key: 'prospect', label: '🟡 Prospect',     color: '#fbbf24' },
-    { key: 'rappel',   label: '🟠 À Rappeler',   color: '#fb923c' },
-    { key: 'client',   label: '🟢 Client',       color: '#6ef56a' },
-    { key: 'lost',     label: '🔴 Perdu',        color: '#ff6b47' }
-  ];
-
-  stages.forEach(stage => {
-    const contacts = allContacts.filter(c => c.status === stage.key);
-    const col = document.createElement('div');
-    col.className = 'pipeline-col';
-    col.innerHTML = `
-      <div class="p-3 rounded-2xl mb-2 flex items-center justify-between" style="background:${stage.color}22;border:1px solid ${stage.color}44">
-        <span class="font-display font-bold text-sm">${stage.label}</span>
-        <span class="badge" style="background:${stage.color}33;color:${stage.color};border:1px solid ${stage.color}55">${contacts.length}</span>
-      </div>
-      <div class="space-y-2">
-        ${contacts.map(c => `
-          <div class="contact-card" onclick='openContactModal(${JSON.stringify(c).replace(/'/g,"\\'")})' style="border-color:${stage.color}33">
-            <div class="font-display font-semibold text-sm">${c.prenom||''} ${c.nom||''}</div>
-            <div class="text-xs mt-1" style="color:var(--muted)">${c.societe||'—'}</div>
-            ${c.ca_estime ? `<div class="text-xs mt-1" style="color:#6ef56a">💰 ${c.ca_estime}€</div>` : ''}
-          </div>
-        `).join('')}
-        ${!contacts.length ? '<div class="text-center py-6 text-xs" style="color:var(--muted)">Aucun contact</div>' : ''}
-      </div>
-    `;
-    board.appendChild(col);
-  });
-}
-
-// ============================================================
-// AI MODULE
-// ============================================================
-function renderHotProspects() {
-  const hot = allContacts
-    .filter(c => c.status === 'rappel' || c.status === 'prospect')
-    .sort((a,b) => new Date(b.updated_at||0) - new Date(a.updated_at||0))
-    .slice(0, 5);
-
-  const el = document.getElementById('hot-prospects');
-  if (!hot.length) {
-    el.innerHTML = '<div class="text-sm text-center py-4" style="color:var(--muted)">Aucun prospect chaud détecté</div>';
-    return;
-  }
-
-  el.innerHTML = hot.map((c, i) => `
-    <div class="flex items-center gap-3 p-3 rounded-xl" style="background:rgba(255,255,255,0.03);border:1px solid var(--border)">
-      <div class="text-lg">${['🥇','🥈','🥉','4️⃣','5️⃣'][i]}</div>
-      <div class="flex-1 min-w-0">
-        <div class="font-display font-semibold text-sm truncate">${c.prenom||''} ${c.nom||''}</div>
-        <div class="text-xs truncate" style="color:var(--muted)">${c.societe||c.email||'—'} • ${statusLabel(c.status)}</div>
-      </div>
-      ${c.phone ? `<a href="tel:${c.phone}" class="btn-icon" style="background:rgba(96,112,244,0.2);font-size:18px;width:40px;height:40px" onclick="event.stopPropagation()">📞</a>` : ''}
-    </div>
-  `).join('');
-}
-
-function populateAISelect() {
-  const sel = document.getElementById('ai-contact-select');
-  sel.innerHTML = '<option value="">-- Choisir un contact --</option>';
-  allContacts.forEach(c => {
-    const opt = document.createElement('option');
-    opt.value = c.id;
-    opt.textContent = `${c.prenom||''} ${c.nom||''} — ${c.societe||c.email||''}`;
-    sel.appendChild(opt);
-  });
-}
-
-async function generateAIMessage() {
-  const selId = document.getElementById('ai-contact-select').value;
-  const msgType = document.getElementById('ai-msg-type').value;
-  if (!selId) { showNotif('⚠️ Sélectionnez un contact', 'warning'); return; }
-
-  const contact = allContacts.find(c => c.id === selId);
-  if (!contact) return;
-
-  const resultDiv = document.getElementById('ai-message-result');
-  const textDiv   = document.getElementById('ai-message-text');
-  resultDiv.classList.remove('hidden');
-  textDiv.innerHTML = '<span class="loader"></span> Génération en cours...';
-
-  await new Promise(r => setTimeout(r, 800));
-
-  const msg = buildAIMessage(contact, msgType);
-  textDiv.textContent = msg;
-  window.__currentAIMsg    = msg;
-  window.__currentAIContact = contact;
-}
-
-function buildAIMessage(contact, type) {
-  const name    = (contact.prenom || contact.nom || 'vous').trim();
-  const company = contact.societe ? ` chez ${contact.societe}` : '';
-  const status  = contact.status;
-
-  const templates = {
-    email: {
-      lead: `Objet : Découvrez comment nous pouvons vous aider\n\nBonjour ${name},\n\nJ'espère que vous allez bien. Je me permets de vous contacter car votre profil${company} a retenu toute notre attention.\n\nNous aidons des entreprises comme la vôtre à atteindre leurs objectifs commerciaux avec des solutions sur-mesure. Seriez-vous disponible pour un échange de 15 minutes cette semaine ?\n\nCordialement,\n${userProfile?.full_name || 'L\'équipe'}`,
-      prospect: `Objet : Suite à notre dernier échange\n\nBonjour ${name},\n\nJe reviens vers vous suite à notre précédente conversation. Avez-vous eu l'occasion de réfléchir à notre proposition ?\n\nJe reste disponible pour répondre à toutes vos questions et personnaliser notre offre selon vos besoins spécifiques${company ? ' au sein de ' + contact.societe : ''}.\n\nDans l'attente de votre retour,\n${userProfile?.full_name || 'L\'équipe'}`,
-      rappel: `Objet : Rappel — Êtes-vous disponible ?\n\nBonjour ${name},\n\nComme convenu, je me permets de revenir vers vous. Comment puis-je vous aider à avancer dans votre décision ?\n\nJe suis disponible à tout moment pour en discuter.\n\nCordialement,\n${userProfile?.full_name || 'L\'équipe'}`,
-      client: `Objet : Merci pour votre confiance !\n\nBonjour ${name},\n\nMerci d'être parmi nos clients${company}. Votre satisfaction est notre priorité absolue.\n\nN'hésitez pas à nous faire part de vos retours ou besoins additionnels.\n\nÀ très bientôt,\n${userProfile?.full_name || 'L\'équipe'}`
-    },
-    sms: {
-      lead: `Bonjour ${name}, je me permets de vous contacter car votre profil nous a intéressés. Avez-vous 15min cette semaine pour un échange rapide ? Répondez à ce message pour convenir d'un RDV.`,
-      prospect: `Bonjour ${name}, suite à notre échange, avez-vous pu réfléchir à notre proposition ? Je reste dispo pour toute question. À bientôt !`,
-      rappel: `Bonjour ${name}, comme prévu je vous recontacte ! Quand êtes-vous disponible pour qu'on puisse avancer ? 😊`,
-      client: `Bonjour ${name}, comment s'est passée votre expérience avec nous ? Votre avis compte beaucoup ! N'hésitez pas à nous écrire.`
-    },
-    whatsapp: {
-      lead: `Bonjour ${name} 👋\n\nJe me permets de vous contacter car nous pensons pouvoir vous apporter une vraie valeur ajoutée${company}.\n\nAuriez-vous 15 minutes cette semaine pour découvrir ce que nous proposons ?\n\n*Merci et à bientôt* 🙏`,
-      prospect: `Bonjour ${name} 😊\n\nSuite à notre dernier échange, je voulais savoir si vous aviez avancé dans votre réflexion ?\n\nJe suis disponible pour répondre à vos questions ou affiner notre proposition selon vos besoins.\n\n*À bientôt* 🚀`,
-      rappel: `Bonjour ${name} 👋\n\nComme convenu, je reviens vers vous ! Avez-vous eu le temps de réfléchir ?\n\nN'hésitez pas, je suis là pour vous aider 😊`,
-      client: `Bonjour ${name} ⭐\n\nMerci d'être notre client ! Nous espérons que tout se passe bien de votre côté.\n\nN'hésitez pas si vous avez le moindre besoin, nous sommes là pour vous 💪`
-    }
-  };
-
-  const statusKey = ['lead','prospect','rappel','client'].includes(status) ? status : 'lead';
-  return (templates[type]?.[statusKey]) || templates.email.lead;
-}
-
-async function generateAIForContact() {
-  if (!modalAIContact) return;
-  const type = 'whatsapp';
-  const msg  = buildAIMessage(modalAIContact, type);
-  document.getElementById('modal-ai-result').classList.remove('hidden');
-  document.getElementById('modal-ai-text').textContent = msg;
-  window.__currentAIMsg    = msg;
-  window.__currentAIContact = modalAIContact;
-}
-
-function sendMessage(channel) {
-  const c = window.__currentAIContact;
-  const m = window.__currentAIMsg || '';
-  if (!c) return;
-  triggerSend(channel, c, m);
-}
-
-function sendModalMessage(channel) {
-  const c = window.__currentAIContact || modalAIContact;
-  const m = document.getElementById('modal-ai-text')?.textContent || '';
-  if (!c) return;
-  triggerSend(channel, c, m);
-}
-
-function triggerSend(channel, contact, msg) {
-  const phone = (contact.phone || '').replace(/\D/g,'');
-  const email = contact.email || '';
-  const enc   = encodeURIComponent(msg);
-
-  if (channel === 'whatsapp' && phone) {
-    window.open(`https://wa.me/${phone}?text=${enc}`, '_blank');
-  } else if (channel === 'sms' && phone) {
-    window.open(`sms:${phone}?body=${enc}`, '_blank');
-  } else if (channel === 'email' && email) {
-    window.open(`mailto:${email}?subject=Message&body=${enc}`, '_blank');
-  } else {
-    navigator.clipboard.writeText(msg).then(() => showNotif('📋 Message copié !', 'success'));
-  }
-}
-
-function copyMessage() {
-  const msg = window.__currentAIMsg || document.getElementById('ai-message-text')?.textContent || '';
-  navigator.clipboard.writeText(msg).then(() => showNotif('📋 Copié dans le presse-papier !', 'success'));
-}
-
-// ============================================================
-// IMPORT
-// ============================================================
-function triggerImport() {
-  document.getElementById('import-file').click();
-}
-
-async function handleImport(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-
-  showNotif('📂 Lecture du fichier...', 'info');
-
-  const ext = file.name.split('.').pop().toLowerCase();
-  let contacts = [];
-
-  if (ext === 'csv' || ext === 'txt') {
-    const text = await file.text();
-    contacts = parseCSV(text);
-  } else if (ext === 'xlsx' || ext === 'xls') {
-    contacts = await parseXLSX(file);
-  }
-
-  if (!contacts.length) {
-    showNotif('⚠️ Aucun contact trouvé dans le fichier', 'warning');
-    return;
-  }
-
-  showNotif(`📥 ${contacts.length} contacts détectés, import en cours...`, 'info');
-
-  const toInsert = contacts.map(c => ({
-    prenom:    c.prenom || c.Prenom || c['Prénom'] || c.firstname || c['First Name'] || '',
-    nom:       c.nom    || c.Nom    || c.lastname  || c['Last Name'] || c.name || '',
-    email:     c.email  || c.Email  || c['E-mail'] || '',
-    phone:     c.phone  || c.Phone  || c.Telephone || c['Téléphone'] || c.tel || '',
-    societe:   c.societe|| c.Societe|| c.Company   || c.company || c.Société || '',
-    status:    normalizeStatus(c.status || c.Status || c.Statut || 'lead'),
-    notes:     c.notes  || c.Notes  || '',
-    ca_estime: parseFloat(c.ca || c.CA || c['CA Estimé'] || 0) || 0,
-    user_id:   currentUser.id,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
-  }));
-
-  if (isOnline) {
-    const { data, error } = await db.from('contacts').insert(toInsert).select();
-    if (error) {
-      showNotif('❌ Erreur import : ' + error.message, 'error');
-    } else {
-      allContacts.unshift(...(data || []));
-      filteredContacts = [...allContacts];
-      filterContacts();
-      renderDashboard();
-      showNotif(`✅ ${toInsert.length} contacts importés !`, 'success');
-    }
-  } else {
-    toInsert.forEach(c => { c.id = 'local_' + Date.now() + Math.random(); addPending({ type:'upsert', data: c }); });
-    allContacts.unshift(...toInsert);
-    filteredContacts = [...allContacts];
-    filterContacts();
-    showNotif(`📱 ${toInsert.length} contacts sauvegardés localement`, 'warning');
-  }
-
-  event.target.value = '';
-}
-
-function parseCSV(text) {
-  const lines  = text.split(/\r?\n/).filter(l => l.trim());
-  if (!lines.length) return [];
-  const headers = lines[0].split(/[,;\t]/).map(h => h.trim().replace(/"/g,''));
-  return lines.slice(1).map(line => {
-    const vals = line.split(/[,;\t]/).map(v => v.trim().replace(/^"|"$/g,''));
-    const obj  = {};
-    headers.forEach((h, i) => { obj[h] = vals[i] || ''; });
-    return obj;
-  });
-}
-
-async function parseXLSX(file) {
-  return new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const wb    = XLSX.read(e.target.result, { type: 'binary' });
-      const sheet = wb.Sheets[wb.SheetNames[0]];
-      const data  = XLSX.utils.sheet_to_json(sheet, { defval: '' });
-      resolve(data);
-    };
-    reader.readAsBinaryString(file);
-  });
-}
-
-function normalizeStatus(s) {
-  s = (s || '').toLowerCase();
-  if (s.includes('client')) return 'client';
-  if (s.includes('prospect')) return 'prospect';
-  if (s.includes('rappel') || s.includes('call')) return 'rappel';
-  if (s.includes('perdu') || s.includes('lost') || s.includes('non')) return 'lost';
-  return 'lead';
-}
-
-// ============================================================
-// EXPORT XLSX (Admin Only)
-// ============================================================
-async function exportXLSX() {
-  if (!isAdmin) { showNotif('❌ Action réservée aux administrateurs', 'error'); return; }
-
-  showNotif('📥 Génération du fichier Excel...', 'info');
-
-  const { data, error } = await db.from('contacts').select('*').order('created_at', { ascending: false });
-  if (error) { showNotif('❌ Erreur export', 'error'); return; }
-
-  const rows = (data || []).map(c => ({
-    'Prénom':     c.prenom   || '',
-    'Nom':        c.nom      || '',
-    'Email':      c.email    || '',
-    'Téléphone':  c.phone    || '',
-    'Société':    c.societe  || '',
-    'Statut':     statusLabel(c.status),
-    'CA Estimé':  c.ca_estime || 0,
-    'Notes':      c.notes    || '',
-    'Créé le':    formatDate(c.created_at),
-    'Modifié le': formatDate(c.updated_at)
-  }));
-
-  const wb = XLSX.utils.book_new();
-  const ws = XLSX.utils.json_to_sheet(rows);
-  XLSX.utils.book_append_sheet(wb, ws, 'Contacts NexCRM');
-  XLSX.writeFile(wb, `NexCRM_Export_${new Date().toISOString().split('T')[0]}.xlsx`);
-  showNotif('✅ Export réussi !', 'success');
-}
-
-// ============================================================
-// ADMIN — Users
-// ============================================================
-async function loadUsers() {
-  const { data, error } = await db.from('profiles').select('*');
-  if (error || !data) return;
-
-  const list = document.getElementById('users-list');
-  list.innerHTML = data.map(u => `
-    <div class="flex items-center justify-between p-3 rounded-xl" style="background:rgba(255,255,255,0.04);border:1px solid var(--border)">
-      <div>
-        <div class="font-display font-semibold text-sm">${u.full_name || u.email}</div>
-        <div class="text-xs" style="color:var(--muted)">${u.email}</div>
-      </div>
-      <select class="input-dark" style="width:auto;padding:6px 10px;font-size:12px" onchange="updateUserRole('${u.id}', this.value)" ${u.email === ADMIN_EMAIL ? 'disabled' : ''}>
-        <option value="user" ${u.role !== 'admin' ? 'selected' : ''}>Utilisateur</option>
-        <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>Admin</option>
-      </select>
-    </div>
-  `).join('');
-}
-
-async function updateUserRole(userId, role) {
-  const { error } = await db.from('profiles').update({ role }).eq('id', userId);
-  if (error) showNotif('❌ Erreur mise à jour', 'error');
-  else showNotif('✅ Rôle mis à jour', 'success');
-}
-
-// ============================================================
-// CONFIRM / DELETE ALL
-// ============================================================
-function confirmDeleteAll() {
-  if (!isAdmin) return;
-  showConfirm('⚠️ SUPPRIMER TOUTE LA BASE ?', 'Cette action supprimera définitivement TOUS les contacts. Cette opération est irréversible.', async () => {
-    const { error } = await db.from('contacts').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-    if (error) showNotif('❌ Erreur : ' + error.message, 'error');
-    else {
-      allContacts = []; filteredContacts = [];
-      filterContacts(); renderDashboard();
-      showNotif('🗑️ Base de données réinitialisée', 'success');
-    }
-  });
-}
-
-function showConfirm(title, text, callback) {
-  document.getElementById('confirm-title').textContent = title;
-  document.getElementById('confirm-text').textContent  = text;
-  document.getElementById('confirm-modal').classList.remove('hidden');
-  document.body.style.overflow = 'hidden';
-  confirmCallback = callback;
-}
-
-function closeConfirm() {
-  document.getElementById('confirm-modal').classList.add('hidden');
-  document.body.style.overflow = '';
-  confirmCallback = null;
-}
-
-document.getElementById('confirm-ok-btn').onclick = () => {
-  if (confirmCallback) confirmCallback();
-  closeConfirm();
-};
-
-// ============================================================
-// PROFILE MODAL
-// ============================================================
-function openProfileModal() {
-  document.getElementById('profile-modal').classList.remove('hidden');
-  document.body.style.overflow = 'hidden';
-}
-function closeProfileModal() {
-  document.getElementById('profile-modal').classList.add('hidden');
-  document.body.style.overflow = '';
-}
-
-// ============================================================
-// NOTIFICATIONS
-// ============================================================
-function showNotif(message, type = 'info') {
-  const colors = {
-    success: 'background:linear-gradient(135deg,rgba(110,245,106,0.2),rgba(110,245,106,0.1));border:1px solid rgba(110,245,106,0.3)',
-    error:   'background:linear-gradient(135deg,rgba(255,107,71,0.2),rgba(255,107,71,0.1));border:1px solid rgba(255,107,71,0.3)',
-    warning: 'background:linear-gradient(135deg,rgba(251,191,36,0.2),rgba(251,191,36,0.1));border:1px solid rgba(251,191,36,0.3)',
-    info:    'background:linear-gradient(135deg,rgba(96,112,244,0.2),rgba(96,112,244,0.1));border:1px solid rgba(96,112,244,0.3)'
-  };
-
-  const el = document.createElement('div');
-  el.className = 'notif-toast glass';
-  el.style.cssText = colors[type] || colors.info;
-  el.innerHTML = `<div class="text-sm font-semibold" style="color:var(--text)">${message}</div>`;
-  document.getElementById('notif-container').appendChild(el);
-  setTimeout(() => { el.style.opacity = '0'; el.style.transform = 'translateX(120%)'; setTimeout(() => el.remove(), 300); }, 3500);
-}
-
-function checkReminders() {
-  const rappels = allContacts.filter(c => c.status === 'rappel');
-  if (rappels.length > 0) {
-    showNotif(`🔔 ${rappels.length} contact(s) à rappeler aujourd'hui !`, 'warning');
-  }
-}
-
-async function requestNotifPermission() {
-  if ('Notification' in window) {
-    const perm = await Notification.requestPermission();
-    if (perm === 'granted') {
-      showNotif('✅ Notifications activées !', 'success');
-      new Notification('NexCRM', { body: 'Notifications actives — Vous recevrez vos rappels !' });
-    }
-  }
-}
-
-// ============================================================
-// HELPERS
-// ============================================================
-function statusColor(s) {
-  const m = { lead:'rgba(96,112,244,0.2)', prospect:'rgba(251,191,36,0.2)', client:'rgba(110,245,106,0.2)', lost:'rgba(255,107,71,0.2)', rappel:'rgba(251,146,60,0.2)' };
-  return m[s] || m.lead;
-}
-function statusEmoji(s) {
-  const m = { lead:'🔵', prospect:'🟡', client:'🟢', lost:'🔴', rappel:'🟠' };
-  return m[s] || '⚪';
-}
-function statusBadgeClass(s) {
-  const m = { lead:'badge-lead', prospect:'badge-prospect', client:'badge-client', lost:'badge-lost', rappel:'badge-rappel' };
-  return m[s] || 'badge-lead';
-}
-function statusLabel(s) {
-  const m = { lead:'Lead', prospect:'Prospect', client:'Client', lost:'Perdu', rappel:'À Rappeler' };
-  return m[s] || s || '—';
-}
-function typeEmoji(t) {
-  const m = { appel:'📞', email:'📧', rdv:'🤝', whatsapp:'💚', note:'📝' };
-  return m[t] || '📋';
-}
-function resultBadge(r) {
-  const m = { positif:'badge-client', negatif:'badge-lost', neutre:'badge-lead', rappel:'badge-rappel', vm:'badge-prospect' };
-  return m[r] || 'badge-lead';
-}
-function formatDate(d) {
-  if (!d) return '—';
-  return new Date(d).toLocaleDateString('fr', { day:'2-digit', month:'short', year:'numeric' });
-}
-
-// ============================================================
-// CLOSE modals on overlay click
-// ============================================================
-['contact-modal','profile-modal','interaction-modal'].forEach(id => {
-  document.getElementById(id).addEventListener('click', function(e) {
-    if (e.target === this) {
-      this.classList.add('hidden');
-      document.body.style.overflow = '';
-    }
-  });
 });
 
-// ============================================================
-// START
-// ============================================================
-init();
-</script>
-</body>
-</html>
+// Debug: vérifier config au démarrage
+console.log('[Config] Supabase URL:', SB_URL.includes('tkikhtpzpixzscpkewlh') ? '✅ Correct' : '❌ MAUVAIS PROJET');
+console.log('[Config] window.location.origin:', window.location.origin);
+
+// ── IndexedDB wrapper ─────────────────────────
+const idb = (() => {
+  const DB='nexcrm_v3'; const VER=3; let _db=null;
+  const open = () => new Promise((res,rej) => {
+    if (_db) return res(_db);
+    const req = indexedDB.open(DB, VER);
+    req.onupgradeneeded = e => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains('contacts')) {
+        const s = db.createObjectStore('contacts',{keyPath:'id'});
+        s.createIndex('user_id','user_id'); s.createIndex('status','status');
+      }
+      if (!db.objectStoreNames.contains('pending'))
+        db.createObjectStore('pending',{keyPath:'_pid',autoIncrement:true});
+      if (!db.objectStoreNames.contains('interactions')) {
+        const s = db.createObjectStore('interactions',{keyPath:'id'});
+        s.createIndex('contact_id','contact_id');
+      }
+      if (!db.objectStoreNames.contains('call_logs'))
+        db.createObjectStore('call_logs',{keyPath:'id'});
+    };
+    req.onsuccess = e => { _db=e.target.result; res(_db); };
+    req.onerror   = () => rej(req.error);
+  });
+  const getAll = async store => {
+    const db = await open();
+    return new Promise((res,rej) => {
+      const r = db.transaction(store,'readonly').objectStore(store).getAll();
+      r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error);
+    });
+  };
+  const put = async (store, item) => {
+    const db = await open();
+    return new Promise((res,rej) => {
+      const r = db.transaction(store,'readwrite').objectStore(store).put(item);
+      r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error);
+    });
+  };
+  const del = async (store, key) => {
+    const db = await open();
+    return new Promise((res,rej) => {
+      const r = db.transaction(store,'readwrite').objectStore(store).delete(key);
+      r.onsuccess=()=>res(); r.onerror=()=>rej(r.error);
+    });
+  };
+  return {
+    saveContact:   c  => put('contacts', c),
+    saveContacts:  cs => open().then(db => new Promise((res,rej)=>{
+      const t=db.transaction('contacts','readwrite'); const s=t.objectStore('contacts');
+      cs.forEach(c=>s.put(c)); t.oncomplete=res; t.onerror=rej;
+    })),
+    getContacts:   ()  => getAll('contacts'),
+    deleteContact: id  => del('contacts', id),
+    saveInteraction: i  => put('interactions', i),
+    getInteractions:()  => getAll('interactions'),
+    saveCallLog:   l  => put('call_logs', l),
+    getCallLogs:   ()  => getAll('call_logs'),
+    addPending:    op  => put('pending', op),
+    getPending:    ()  => getAll('pending'),
+    delPending:    pid => del('pending', pid),
+    clearAll: () => open().then(db => new Promise((res,rej)=>{
+      const stores=['contacts','interactions','call_logs','pending'];
+      const t=db.transaction(stores,'readwrite');
+      stores.forEach(s=>t.objectStore(s).clear());
+      t.oncomplete=res; t.onerror=rej;
+    }))
+  };
+})();
+
+// ── State ─────────────────────────────────────
+let me=null, profile=null, isAdmin=false;
+let contacts=[], filtered=[];
+let stFilter='all', srchQ='', curPg='dash';
+let editId=null, modalC=null, aiC=null, aiMsgTxt='';
+let confCb=null, online=navigator.onLine;
+let charts={}, pageIdx=0, totalPages=1;
+let dupT=null, voipConn=false, voipTimerInt=null, voipSec=0;
+let draggedContact=null;
+
+// ── Helpers ───────────────────────────────────
+const $   = id => document.getElementById(id);
+const esc = s  => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const fN  = n  => n>=1000?(n/1000).toFixed(1)+'k':String(n);
+const fDate=d  => d?new Date(d).toLocaleDateString('fr',{day:'2-digit',month:'short',year:'numeric'}):'—';
+const fSec= s  => `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+const delay=ms => new Promise(r=>setTimeout(r,ms));
+const uuid= () => crypto.randomUUID ? crypto.randomUUID() : ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g,c=>(c^crypto.getRandomValues(new Uint8Array(1))[0]&15>>c/4).toString(16));
+
+function toast(msg, type='info') {
+  const c={success:'background:rgba(132,204,22,.2);border:1px solid rgba(132,204,22,.4)',
+           error:  'background:rgba(244,63,94,.2);border:1px solid rgba(244,63,94,.4)',
+           warning:'background:rgba(245,158,11,.2);border:1px solid rgba(245,158,11,.4)',
+           info:   'background:rgba(99,102,241,.2);border:1px solid rgba(99,102,241,.4)'};
+  const el=document.createElement('div');
+  el.className='toast'; el.style.cssText=c[type]||c.info;
+  el.innerHTML=`<div style="font-size:13.5px;font-weight:600;color:var(--text)">${esc(msg)}</div>`;
+  $('toasts').appendChild(el);
+  setTimeout(()=>{el.classList.add('toast-out');setTimeout(()=>el.remove(),300)},3800);
+}
+const showModal  = id => { $(id).style.display='flex'; document.body.style.overflow='hidden'; };
+const closeModal = id => { $(id).style.display='none'; document.body.style.overflow=''; };
+
+// ── HELPERS SUPABASE ─────────────────────────────────────────────────────
+// FIX: Retire les colonnes calculées et non-envoyables avant tout upsert/insert
+function sanitizeContact(c, isInsert = false) {
+  const safe = Object.assign({}, c);
+  // Colonnes JAMAIS envoyées à Supabase (générées ou read-only)
+  delete safe.phone_normalized; // GENERATED ALWAYS AS STORED
+  // Pour les inserts : laisser Supabase gérer les timestamps via DEFAULT/trigger
+  if (isInsert) {
+    delete safe.created_at;
+    delete safe.updated_at;
+  }
+  // Sécurité : forcer user_id valide
+  if (!safe.user_id && window._nexcrmUserId) safe.user_id = window._nexcrmUserId;
+  return safe;
+}
+
+// FIX: Probe réseau Supabase réel (pas navigator.onLine seul)
+async function probeSupabase() {
+  try {
+    // Probe léger : GET sur l'URL Supabase health (pas de RLS nécessaire)
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 5000); // timeout 5s
+    const resp = await fetch(
+      'https://tkikhtpzpixzscpkewlh.supabase.co/rest/v1/',
+      {
+        method: 'HEAD',
+        headers: { 'apikey': 'sb_publishable_or9nFB9PectQNg5BFtTrAQ_UuX_tBB2' },
+        signal: controller.signal
+      }
+    );
+    clearTimeout(timer);
+    // Tout code HTTP sauf network error = Supabase accessible
+    console.log('[Probe] Supabase HTTP status:', resp.status);
+    return true;
+  } catch(e) {
+    // AbortError = timeout, TypeError = réseau coupé
+    if(e.name === 'AbortError' || (e instanceof TypeError && e.message.toLowerCase().includes('fetch'))){
+      console.warn('[Probe] ❌ Supabase injoignable:', e.name, e.message);
+      return false;
+    }
+    // Toute autre erreur = online (erreur applicative, pas réseau)
+    console.log('[Probe] Erreur non-réseau (online):', e.message);
+    return true;
+  }
+}
+
+// ── BOOT ──────────────────────────────────────
+(async()=>{
+  // FIX BUG2: Listeners réseau natifs
+  window.addEventListener('online', async () => {
+    console.log('[Network] navigator online event');
+    const sbOk = await probeSupabase();
+    online = sbOk;
+    updateOffline();
+    if (online) {
+      toast('✅ Connexion rétablie', 'success');
+      syncPending();
+    }
+  });
+  window.addEventListener('offline', () => {
+    console.log('[Network] navigator offline event');
+    online = false;
+    updateOffline();
+    toast('⚠️ Connexion perdue — mode hors-ligne', 'warning');
+  });
+  
+  // FIX BUG2: Polling Supabase toutes les 30s pour corriger faux offline
+  setInterval(async () => {
+    if (!me) return; // pas connecté
+    const wasOnline = online;
+    const sbOk = await probeSupabase();
+    if (sbOk !== wasOnline) {
+      online = sbOk;
+      updateOffline();
+      console.log('[Network] Changement état:', sbOk ? 'ONLINE' : 'OFFLINE');
+      if (sbOk && !wasOnline) { syncPending(); toast('✅ Reconnecté', 'success'); }
+    }
+  }, 30000);
+  
+  // Initial state - sera recalibré dans afterLogin()
+  online = navigator.onLine;
+  updateOffline();
+
+  // Close modals on overlay click
+  ['m-contact','m-int','m-confirm','m-profile','m-reset-pass'].forEach(id=>{
+    const el = $(id);
+    if (el) el.addEventListener('click', e => { if(e.target === el) closeModal(id); });
+  });
+  // Import progress modal: only closeable via button (not overlay click - prevents accidental close)
+  $('conf-ok').addEventListener('click',()=>{ if(confCb){confCb();closeConfirm();} });
+
+  // PATCH AUTH: Vérifier hash URL AVANT getSession (pour email confirmation + recovery)
+  const bootHash = window.location.hash;
+  console.log('[Boot] URL hash:', bootHash ? bootHash.substring(0, 50) : 'none');
+  
+  try {
+    // Supabase SDK auto-parse le hash → session disponible via getSession()
+    const {data:{session}} = await sb.auth.getSession();
+    
+    if (session?.user) { 
+      me = session.user;
+      await afterLogin();
+    } else if (bootHash.includes('access_token')) {
+      // Hash présent mais session pas encore parsée → attendre onAuthStateChange
+      console.log('[Boot] Hash détecté, attente onAuthStateChange...');
+      showAuth();
+      toast('🔄 Vérification en cours...', 'info');
+    } else {
+      showAuth();
+    }
+  } catch(e) { 
+    console.error('[Boot] Erreur init:', e); 
+    showAuth(); 
+    toast('Erreur connexion Supabase — vérifiez votre réseau', 'error'); 
+  }
+
+  sb.auth.onAuthStateChange(async(ev,sess)=>{
+    console.log('[Auth] Event:', ev, '| User:', sess?.user?.email || 'none');
+    
+    if (ev === 'SIGNED_IN' && sess?.user && !me) { 
+      me = sess.user; 
+      await afterLogin(); 
+    }
+    if (ev === 'PASSWORD_RECOVERY' && sess?.user) {
+      // PATCH AUTH: Token de récupération reçu → afficher écran reset
+      console.log('[Auth] PASSWORD_RECOVERY → affichage reset password');
+      me = sess.user;
+      window._nexcrmUserId = me.id;
+      showAuth(); // Montre l'écran auth
+      setTimeout(() => showResetModal(), 300);
+    }
+    if (ev === 'USER_UPDATED') {
+      console.log('[Auth] Profil mis à jour');
+      toast('✅ Profil mis à jour', 'success');
+    }
+    if (ev === 'SIGNED_OUT') { 
+      me = null; profile = null; contacts = []; filtered = []; 
+      stopRealtime();
+      showAuth(); 
+    }
+    if (ev === 'TOKEN_REFRESHED') {
+      console.log('[Auth] Token rafraîchi avec succès');
+    }
+  });
+
+  // Service Worker : désactivé intentionnellement pour mobile
+  // RAISON: blob: URL interdit sur Safari iOS et Chrome Android
+  // Le SW depuis blob: intercepte Supabase API → retourne 503 → faux offline
+  // À réactiver UNIQUEMENT si l'app est servie depuis un domaine (Vercel/Netlify)
+  // avec un fichier /sw.js statique dédié
+  if ('serviceWorker' in navigator && !window.location.href.startsWith('blob:')) {
+    // SW désactivé - décommenter si déployé sur Vercel avec sw.js statique
+    // navigator.serviceWorker.register('/sw.js').catch(() => {});
+    console.log('[SW] Service Worker non enregistré (sécurité mobile)');
+  }
+})();
+
+
+// ═══════════════════════════════════════════════════════════
+// PATCH AUTH: Hash redirect handler for Supabase email links
+// Handles: email confirmation, password recovery, magic links
+// Compatible: Android Chrome, iOS Safari, Vercel deploy
+// ═══════════════════════════════════════════════════════════
+async function handleAuthRedirect() {
+  const hash = window.location.hash;
+  if (!hash || !hash.includes('access_token')) return false;
+
+  console.log('[Auth] Hash redirect détecté:', hash.substring(0, 60) + '...');
+
+  // Parse hash params
+  const params = {};
+  hash.replace(/^#/, '').split('&').forEach(part => {
+    const [k, v] = part.split('=');
+    if (k) params[decodeURIComponent(k)] = decodeURIComponent(v || '');
+  });
+
+  const type = params.type || '';
+  console.log('[Auth] Type redirect:', type);
+
+  if (type === 'recovery') {
+    // PASSWORD RESET FLOW
+    console.log('[Auth] Mode récupération mot de passe');
+    // Set session from hash (Supabase handles this via onAuthStateChange)
+    // Show reset password screen
+    setTimeout(() => showResetPasswordScreen(), 300);
+    return true;
+  }
+
+  if (type === 'signup' || type === 'email_change' || type === 'magiclink') {
+    // EMAIL CONFIRMATION — session auto-set by Supabase SDK
+    console.log('[Auth] Email confirmé, connexion auto...');
+    toast('✅ Email confirmé ! Connexion en cours...', 'success');
+    return true;
+  }
+
+  return false;
+}
+
+function showResetPasswordScreen() {
+  // Hide auth tabs, show reset form
+  if ($('f-in')) $('f-in').style.display = 'none';
+  if ($('f-up')) $('f-up').style.display = 'none';
+  if ($('auth-tab-switcher')) $('auth-tab-switcher').style.display = 'none';
+  if ($('f-reset')) {
+    $('f-reset').style.display = 'block';
+  } else {
+    // Fallback: show modal
+    showResetModal();
+  }
+}
+
+async function doForgotPassword() {
+  const email = ($('forgot-email') || $('si-e')).value.trim();
+  if (!email) return toast('⚠️ Entrez votre email', 'warning');
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return toast('⚠️ Email invalide', 'warning');
+
+  const btn = $('btn-forgot');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Envoi...'; }
+
+  // redirectTo = current page URL (works on Vercel, Android, etc.)
+  // PATCH: Utiliser uniquement l'origine (fonctionne sur Vercel, mobile, PWA)
+  // NE PAS utiliser window.location.href (contient des paths qui cassent le redirect)
+  const redirectTo = window.location.origin;
+  console.log('[ForgotPass] redirectTo:', redirectTo);
+  const { error } = await sb.auth.resetPasswordForEmail(email, {
+    redirectTo: redirectTo
+  });
+
+  if (btn) { btn.disabled = false; btn.textContent = '📧 Envoyer le lien'; }
+
+  if (error) {
+    toast('❌ ' + error.message, 'error');
+  } else {
+    toast('📧 Email de récupération envoyé ! Vérifiez votre boîte.', 'success');
+    showForgotDone();
+  }
+}
+
+function showForgotDone() {
+  if ($('forgot-done')) $('forgot-done').style.display = 'block';
+  if ($('forgot-form')) $('forgot-form').style.display = 'none';
+}
+
+async function doResetPassword() {
+  const pass1 = ($('reset-pass1') || { value: '' }).value;
+  const pass2 = ($('reset-pass2') || { value: '' }).value;
+
+  if (!pass1 || pass1.length < 6) return toast('⚠️ Mot de passe trop court (min. 6)', 'warning');
+  if (pass1 !== pass2) return toast('⚠️ Les mots de passe ne correspondent pas', 'warning');
+
+  const btn = $('btn-reset-pass');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Mise à jour...'; }
+
+  const { error } = await sb.auth.updateUser({ password: pass1 });
+
+  if (btn) { btn.disabled = false; btn.textContent = '🔐 Mettre à jour'; }
+
+  if (error) {
+    toast('❌ ' + error.message, 'error');
+  } else {
+    toast('✅ Mot de passe mis à jour ! Connexion en cours...', 'success');
+    // Clean URL hash
+    window.history.replaceState(null, '', window.location.pathname);
+    // App will auto-login via onAuthStateChange
+    setTimeout(() => {
+      if ($('m-reset-pass')) closeModal('m-reset-pass');
+      if ($('f-in')) { $('f-in').style.display = 'block'; }
+    }, 1500);
+  }
+}
+
+function showResetModal() {
+  if ($('m-reset-pass')) showModal('m-reset-pass');
+}
+
+// Admin: reset proprio du mot de passe depuis settings
+async function doAdminPasswordReset(){
+  if(!me?.email) return toast('❌ Non connecté','error');
+  const confirmed = confirm('Envoyer un email de réinitialisation à ' + me.email + ' ?');
+  if(!confirmed) return;
+  const redirectTo = window.location.origin;
+  const { error } = await sb.auth.resetPasswordForEmail(me.email, { redirectTo });
+  if(error) toast('❌ ' + error.message, 'error');
+  else toast('📧 Email envoyé à ' + me.email + ' — Vérifiez votre boîte !', 'success');
+}
+
+// ═══════════════════════════════════════════════════════════
+// PATCH REALTIME: Supabase realtime subscriptions
+// ═══════════════════════════════════════════════════════════
+let realtimeChannel = null;
+
+function startRealtime() {
+  if (realtimeChannel || !me) return;
+  console.log('[Realtime] Démarrage subscriptions...');
+
+  realtimeChannel = sb.channel('nexcrm-live')
+    .on('postgres_changes', {
+      event: '*',
+      schema: 'public',
+      table: 'contacts',
+      filter: isAdmin ? undefined : `user_id=eq.${me.id}`
+    }, async (payload) => {
+      console.log('[Realtime] Contact update:', payload.eventType, payload.new?.id);
+      handleRealtimeContact(payload);
+    })
+    .on('postgres_changes', {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'interactions'
+    }, (payload) => {
+      console.log('[Realtime] Nouvelle interaction:', payload.new?.id);
+    })
+    .subscribe((status) => {
+      console.log('[Realtime] Status:', status);
+      if (status === 'SUBSCRIBED') {
+        console.log('[Realtime] ✅ Subscriptions actives');
+      }
+    });
+}
+
+function stopRealtime() {
+  if (realtimeChannel) {
+    sb.removeChannel(realtimeChannel);
+    realtimeChannel = null;
+    console.log('[Realtime] Subscriptions arrêtées');
+  }
+}
+
+function handleRealtimeContact(payload) {
+  const { eventType, new: newRec, old: oldRec } = payload;
+  if (eventType === 'INSERT' && newRec) {
+    if (!contacts.find(c => c.id === newRec.id)) {
+      contacts.unshift(newRec);
+      idb.saveContact(newRec).catch(() => {});
+      applyFilter();
+      if (curPg === 'dash') renderDash();
+    }
+  } else if (eventType === 'UPDATE' && newRec) {
+    const idx = contacts.findIndex(c => c.id === newRec.id);
+    if (idx >= 0) { contacts[idx] = newRec; idb.saveContact(newRec).catch(() => {}); }
+    else contacts.unshift(newRec);
+    applyFilter();
+    if (curPg === 'dash') renderDash();
+    if (curPg === 'pipe') renderPipe();
+  } else if (eventType === 'DELETE' && oldRec) {
+    contacts = contacts.filter(c => c.id !== oldRec.id);
+    idb.deleteContact(oldRec.id).catch(() => {});
+    applyFilter();
+    if (curPg === 'dash') renderDash();
+  }
+}
+
+async function afterLogin(){
+  isAdmin = me.email===ADM_EMAIL;
+  window._nexcrmUserId = me.id; // PATCH: global safety pour sanitizeContact
+  await loadProfile();
+
+  // PATCH AUTH: Gestion redirect hash (recovery, confirmation)
+  await handleAuthRedirect();
+
+  // FIX BUG2: Probe Supabase réel au lieu de navigator.onLine seul
+  console.log('[Boot] navigator.onLine =', navigator.onLine);
+  const sbOnline = await probeSupabase();
+  online = sbOnline;
+  console.log('[Boot] Supabase probe:', sbOnline ? '✅ ONLINE' : '❌ OFFLINE (réseau ou Supabase indisponible)');
+  updateOffline();
+  
+  showApp();
+  await loadContacts();
+  updatePendCount();
+  
+  // Sync automatique si online
+  if (online && (await idb.getPending()).length > 0) {
+    console.log('[Boot] Opérations en attente détectées → sync...');
+    setTimeout(syncPending, 2000);
+  }
+  
+  setTimeout(checkRappels, 4000);
+  goPage('dash');
+  startRealtime();
+  // PATCH 6: Init debug panel triple-tap
+  setTimeout(initDebugTap, 500);
+}
+
+// ── AUTH ──────────────────────────────────────
+function showAuth(){ $('auth-screen').style.display='flex'; $('app').style.display='none'; }
+function showApp(){  $('auth-screen').style.display='none'; $('app').style.display='block'; setupUI(); }
+
+function authTab(t){
+  const i=t==='in';
+  $('f-in').style.display=i?'block':'none'; $('f-up').style.display=i?'none':'block';
+  const on ='flex:1;padding:12px;border-radius:13px;border:none;font-size:13.5px;font-weight:700;cursor:pointer;background:var(--accent);color:#fff;font-family:Syne,sans-serif;transition:all .18s';
+  const off='flex:1;padding:12px;border-radius:13px;border:none;font-size:13.5px;font-weight:700;cursor:pointer;background:transparent;color:var(--muted);font-family:Syne,sans-serif;transition:all .18s';
+  $('at-in').style.cssText=i?on:off; $('at-up').style.cssText=i?off:on;
+  $('auth-err').style.display='none';
+}
+function authErr(m){const e=$('auth-err');e.textContent=m;e.style.display='block';}
+
+function toggleForgotForm() {
+  const fin    = $('f-in');
+  const fup    = $('f-up');
+  const fforg  = $('f-forgot');
+  const flink  = $('forgot-link');
+  const isShow = fforg.style.display === 'none' || !fforg.style.display;
+  if (fin)   fin.style.display   = isShow ? 'none' : 'block';
+  if (fup)   fup.style.display   = 'none';
+  if (fforg) fforg.style.display = isShow ? 'block' : 'none';
+  if (flink) flink.style.display = isShow ? 'none'  : 'block';
+  // Reset forgot form state
+  if (isShow) {
+    if ($('forgot-done'))  $('forgot-done').style.display  = 'none';
+    if ($('forgot-form'))  $('forgot-form').style.display  = 'block';
+    if ($('forgot-email')) $('forgot-email').value = '';
+    // Pre-fill email from signin field
+    const siEmail = $('si-e')?.value || '';
+    if (siEmail && $('forgot-email')) $('forgot-email').value = siEmail;
+  }
+  $('auth-err').style.display = 'none';
+}
+function setBtnLoad(bid,tid,loading,txt=''){
+  const b=$(bid); if(!b) return; b.disabled=loading;
+  $(tid).innerHTML=loading?'<span class="spinner" style="width:16px;height:16px;border-width:2px"></span>':esc(txt);
+}
+async function doSignIn(){
+  const email=$('si-e').value.trim(), pass=$('si-p').value;
+  if(!email||!pass) return authErr('Remplissez tous les champs');
+  setBtnLoad('btn-si','si-txt',true);
+  const {error}=await sb.auth.signInWithPassword({email,password:pass});
+  setBtnLoad('btn-si','si-txt',false,'Se connecter →');
+  if(error) authErr(error.message);
+}
+async function doSignUp(){
+  const name=$('su-n').value.trim(), email=$('su-e').value.trim(), pass=$('su-p').value;
+  if(!name||!email||!pass) return authErr('Remplissez tous les champs');
+  if(pass.length<6) return authErr('Mot de passe trop court (min. 6)');
+  setBtnLoad('btn-su','su-txt',true);
+  const {data,error}=await sb.auth.signUp({email,password:pass,options:{data:{full_name:name.replace(/[<>&"']/g,'')}}});
+  setBtnLoad('btn-su','su-txt',false,'Créer mon compte →');
+  if(error) return authErr(error.message);
+  if(data.user){ toast('✅ Compte créé ! Vérifiez votre email.','success'); authTab('in'); }
+}
+async function doSignOut(){ 
+  stopRealtime(); // PATCH: arrêt realtime avant déconnexion
+  window._nexcrmUserId = null;
+  await sb.auth.signOut(); 
+  closeProfile(); 
+}
+
+// ── PROFILE ───────────────────────────────────
+async function loadProfile(){
+  console.log('[Profile] Chargement profil pour:', me.email);
+  try {
+    const { data, error } = await sb.from('profiles').select('*').eq('id', me.id).single();
+    
+    if(error && error.code !== 'PGRST116'){ // PGRST116 = row not found (normal si nouveau user)
+      console.warn('[Profile] Erreur lecture:', error.message);
+    }
+    
+    if(data){
+      profile = data;
+      console.log('[Profile] Profil chargé:', profile.full_name, '| Rôle:', profile.role);
+    } else {
+      // Créer le profil s'il n'existe pas (trigger peut avoir raté)
+      profile = {
+        id:        me.id,
+        email:     me.email,
+        full_name: me.user_metadata?.full_name || me.email.split('@')[0],
+        role:      me.email === ADM_EMAIL ? 'admin' : 'user'
+      };
+      console.log('[Profile] Nouveau profil créé localement, insertion Supabase...');
+      const { error: upsertErr } = await sb.from('profiles').upsert(profile);
+      if(upsertErr) console.warn('[Profile] Upsert error:', upsertErr.message);
+    }
+    
+    // Admin forcé par email (sécurité côté client doublonnée par RLS)
+    if(me.email === ADM_EMAIL){ 
+      isAdmin = true; 
+      profile.role = 'admin'; 
+      console.log('[Profile] Admin détecté par email');
+    }
+  } catch(e){
+    console.error('[Profile] Exception:', e);
+    // Fallback profil minimal
+    profile = { id:me.id, email:me.email, full_name:me.email, role:'user' };
+    if(me.email === ADM_EMAIL){ isAdmin=true; profile.role='admin'; }
+  }
+}
+function setupUI(){
+  const n=profile?.full_name||me.email;
+  const rb=isAdmin?'<span class="badge b-admin">⚡ Admin</span>':'<span class="badge b-lead">Utilisateur</span>';
+  ['s-name','pm-name'].forEach(id=>$(id)&&($(id).textContent=n));
+  ['s-email','pm-email'].forEach(id=>$(id)&&($(id).textContent=me.email));
+  ['s-role','pm-role'].forEach(id=>$(id)&&($(id).innerHTML=rb));
+  $('avatar-btn').textContent=isAdmin?'⚡':'👤';
+  $('adm-zone').style.display=isAdmin?'flex':'none';
+  $('adm-users-card').style.display=isAdmin?'block':'none';
+}
+function openProfile(){ showModal('m-profile'); }
+function closeProfile(){ closeModal('m-profile'); }
+
+// ── OFFLINE ───────────────────────────────────
+function updateOffline(){
+  const bar = $('offline-bar');
+  const dot = $('pend-dot');
+  if (!bar || !dot) return;
+  bar.style.display = online ? 'none' : 'block';
+  dot.style.display = online ? 'none' : 'block';
+  // FIX BUG2: log pour debug
+  console.log('[Network]', online ? '✅ ONLINE' : '⚠️ OFFLINE');
+}
+async function updatePendCount(){
+  const p=await idb.getPending();
+  const n=p.length;
+  if($('pend-cnt')) $('pend-cnt').textContent=n;
+  $('pend-dot').style.display=n>0?'block':'none';
+}
+async function syncPending(){
+  if(!online){ console.log('[Sync] Ignoré — hors-ligne'); return; }
+  const pend = await idb.getPending();
+  if(!pend.length){ console.log('[Sync] File vide'); return; }
+
+  console.log('[Sync] ▶ Démarrage —', pend.length, 'opération(s)');
+  $('sync-ind').style.display = 'block';
+  let ok=0, fail=0, skipped=0;
+
+  for(const op of pend){
+    try{
+      let error=null;
+      console.log('[Sync] →', op.t, op._pid);
+
+      if(op.t === 'upsert_contact'){
+        const payload = Object.assign({}, op.d);
+        delete payload.phone_normalized;
+        delete payload.created_at;
+        delete payload.updated_at;
+        if(!payload.user_id) payload.user_id = me?.id;
+        if(!payload.user_id){ skipped++; await idb.delPending(op._pid); continue; }
+        ({ error } = await sb.from('contacts').upsert(payload));
+      }
+      else if(op.t === 'delete_contact'){
+        if(!isAdmin){ skipped++; await idb.delPending(op._pid); continue; }
+        ({ error } = await sb.from('contacts').delete().eq('id', op.id));
+      }
+      else if(op.t === 'insert_interaction'){
+        const payload = Object.assign({}, op.d);
+        if(!payload.contact_id||!payload.user_id){ skipped++; await idb.delPending(op._pid); continue; }
+        ({ error } = await sb.from('interactions').insert(payload));
+      }
+      else if(op.t === 'insert_calllog'){
+        ({ error } = await sb.from('call_logs').insert(op.d));
+      }
+      else { skipped++; await idb.delPending(op._pid); continue; }
+
+      if(error){
+        // 23505 = unique violation → doublon → supprimer sans recompter comme échec
+        if(error.code === '23505'){
+          console.warn('[Sync] Doublon ignoré:', op.t, error.details);
+          await idb.delPending(op._pid); skipped++;
+        } else {
+          console.error('[Sync] ✗', op.t, error.message, error.code);
+          fail++;
+        }
+      } else {
+        console.log('[Sync] ✓', op.t);
+        await idb.delPending(op._pid); ok++;
+      }
+    } catch(e){
+      console.error('[Sync] Exception:', e.message);
+      if(e instanceof TypeError && e.message.includes('fetch')){
+        console.warn('[Sync] Réseau coupé — sync interrompue');
+        online=false; updateOffline(); break;
+      }
+      fail++;
+    }
+  }
+
+  $('sync-ind').style.display = 'none';
+  await updatePendCount();
+
+  console.log(`[Sync] ■ ok=${ok} fail=${fail} skipped=${skipped}`);
+  if(ok)      toast(`✅ ${ok} opération(s) synchronisée(s)`, 'success');
+  if(fail)    toast(`⚠️ ${fail} en échec — réessai dans 60s`, 'warning');
+  if(skipped) console.log('[Sync] Ignorés (doublons/invalides):', skipped);
+  if(ok)      await loadContacts();
+  // Réessai automatique toutes les 60s si échecs persistants
+  if(fail > 0 && online) setTimeout(syncPending, 60000);
+}
+
+// ── CONTACTS LOAD ─────────────────────────────
+async function loadContacts(){
+  console.log('[LoadContacts] Démarrage | online:', online, '| admin:', isAdmin);
+  $('c-skel').style.display='flex'; 
+  $('c-list').innerHTML=''; 
+  $('c-empty').style.display='none';
+  
+  let rows = [];
+  
+  if(online){
+    try{
+      let q = sb.from('contacts').select('*').order('updated_at',{ascending:false});
+      if(!isAdmin) q = q.eq('user_id', me.id);
+      
+      const { data, error } = await q;
+      
+      if(error){
+        console.error('[LoadContacts] Erreur Supabase:', error.message, '| Code:', error.code);
+        // FIX: si erreur auth (401/403), vérifier session
+        if(error.code === 'PGRST301' || error.message.includes('JWT')){
+          console.warn('[LoadContacts] Session expirée, refresh...');
+          const { data: {session} } = await sb.auth.getSession();
+          if(!session){ doSignOut(); return; }
+        }
+        toast('⚠️ Erreur réseau — données locales chargées','warning');
+        rows = await idb.getContacts();
+        if(!isAdmin) rows = rows.filter(c => c.user_id === me.id);
+      } else {
+        rows = data || [];
+        console.log('[LoadContacts] Supabase OK:', rows.length, 'contacts chargés');
+        // Cache IDB en arrière-plan
+        idb.saveContacts(rows).catch(err => 
+          console.warn('[LoadContacts] IDB cache error:', err)
+        );
+      }
+    } catch(networkErr){
+      console.error('[LoadContacts] Exception:', networkErr.message || networkErr);
+      // FIX BUG2: online=false SEULEMENT si c'est une vraie erreur réseau
+      if (networkErr instanceof TypeError && networkErr.message.includes('fetch')) {
+        online = false;
+        updateOffline();
+        console.warn('[LoadContacts] Vrai réseau offline → mode hors-ligne activé');
+      } else {
+        console.warn('[LoadContacts] Erreur Supabase (pas réseau) → on reste online');
+      }
+      rows = await idb.getContacts();
+      if(!isAdmin) rows = rows.filter(c => c.user_id === me.id);
+    }
+  } else {
+    rows = await idb.getContacts();
+    if(!isAdmin) rows = rows.filter(c => c.user_id === me.id);
+    console.log('[LoadContacts] Mode offline - IDB:', rows.length, 'contacts');
+  }
+  
+  contacts = rows;
+  $('c-skel').style.display = 'none';
+  applyFilter();
+  if(curPg === 'dash') renderDash();
+  $('hdr-s').textContent = contacts.length + ' contacts';
+  console.log('[LoadContacts] Terminé:', contacts.length, 'contacts affichés');
+}
+
+// ── FILTER & PAGINATION ───────────────────────
+function applyFilter(){
+  filtered=contacts.filter(c=>{
+    const ms=stFilter==='all'||c.status===stFilter;
+    const mq=!srchQ||`${c.prenom||''} ${c.nom||''} ${c.email||''} ${c.societe||''} ${c.phone||''}`.toLowerCase().includes(srchQ);
+    return ms&&mq;
+  });
+  totalPages=Math.max(1,Math.ceil(filtered.length/PAGE_SIZE));
+  if(pageIdx>=totalPages) pageIdx=0;
+  renderContacts();
+}
+function onSearch(){ srchQ=$('srch').value.toLowerCase().trim(); pageIdx=0; applyFilter(); }
+function setStFilter(s,btn){ stFilter=s; pageIdx=0; document.querySelectorAll('.tab-pill').forEach(b=>b.classList.remove('on')); btn.classList.add('on'); applyFilter(); }
+function pagePrev(){ if(pageIdx>0){pageIdx--;renderContacts();} }
+function pageNext(){ if(pageIdx<totalPages-1){pageIdx++;renderContacts();} }
+
+// ── RENDER CONTACTS ───────────────────────────
+function renderContacts(){
+  const list=$('c-list'), empty=$('c-empty'), pag=$('pagination');
+  list.innerHTML='';
+  if(!filtered.length){ empty.style.display='block'; pag.style.display='none'; return; }
+  empty.style.display='none';
+  const slice=filtered.slice(pageIdx*PAGE_SIZE,(pageIdx+1)*PAGE_SIZE);
+  const frag=document.createDocumentFragment();
+  slice.forEach((c,i)=>{
+    const wrap=document.createElement('div');
+    wrap.style.cssText=`margin-bottom:8px;animation:pgIn .3s ${i*.025}s cubic-bezier(.16,1,.3,1) both`;
+    const card=document.createElement('div');
+    card.className='crow';
+    card.innerHTML=`
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="width:42px;height:42px;border-radius:13px;background:${sColor(c.status)};display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0">${sEmoji(c.status)}</div>
+        <div style="flex:1;min-width:0">
+          <div class="ff" style="font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(c.prenom||'')} ${esc(c.nom||'')}</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(c.societe||c.email||'—')}</div>
+          ${c.phone?`<div style="font-size:11px;color:var(--muted2);margin-top:1px">📞 ${esc(c.phone)}</div>`:''}
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
+          <span class="badge ${sBadge(c.status)}">${sLabel(c.status)}</span>
+          ${c.ca_estime?`<span style="font-size:11px;color:#bef264">💰${fN(c.ca_estime)}€</span>`:''}
+        </div>
+      </div>`;
+    card.addEventListener('click',()=>openCModal(c));
+    wrap.appendChild(card); frag.appendChild(wrap);
+  });
+  list.appendChild(frag);
+  if(totalPages>1){
+    pag.style.display='flex';
+    $('pg-info').textContent=`${pageIdx+1}/${totalPages}`;
+    $('pg-prev').disabled=pageIdx===0; $('pg-next').disabled=pageIdx===totalPages-1;
+  } else pag.style.display='none';
+}
+
+// ── CONTACT MODAL ─────────────────────────────
+function openCModal(c=null){
+  editId=c?.id||null; modalC=c;
+  $('mc-title').textContent=c?(`${c.prenom||''} ${c.nom||''}`.trim()||'Fiche Contact'):'Nouveau Contact';
+  $('fp').value=c?.prenom||''; $('fn').value=c?.nom||''; $('fe').value=c?.email||'';
+  $('ft').value=c?.phone||''; $('fs').value=c?.societe||''; $('fst').value=c?.status||'lead';
+  $('fno').value=c?.notes||''; $('fca').value=c?.ca_estime||'';
+  $('dup-email-warn').style.display='none'; $('dup-phone-warn').style.display='none';
+  $('mc-edit-btns').style.display=c?'flex':'none';
+  $('mc-del').style.display=(c&&isAdmin)?'block':'none';
+  $('mc-ai-box').style.display='none';
+  if(c?.phone){ 
+    $('mc-call').href='#'; 
+    $('mc-call').onclick=(ev)=>{ev.preventDefault();clickToCall(c.phone,c.id);};
+    $('mc-wa').href='https://wa.me/'+c.phone.replace(/\D/g,''); 
+    $('mc-sms').href='sms:'+c.phone; 
+  }
+  showModal('m-contact');
+}
+function closeCModal(){ closeModal('m-contact'); editId=null; modalC=null; }
+
+function checkDup(){
+  clearTimeout(dupT);
+  dupT=setTimeout(()=>{
+    const email=$('fe').value.trim(), phone=$('ft').value.trim();
+    if(email){ const x=contacts.some(c=>c.email===email&&c.id!==editId); $('dup-email-warn').style.display=x?'block':'none'; }
+    if(phone){ const n=phone.replace(/\D/g,''); const x=contacts.some(c=>{const cn=(c.phone||'').replace(/\D/g,'');return cn&&cn===n&&c.id!==editId;}); $('dup-phone-warn').style.display=x?'block':'none'; }
+  },400);
+}
+
+async function saveC(){
+  const prenom=$('fp').value.trim(), nom=$('fn').value.trim(), email=$('fe').value.trim();
+  const phone=$('ft').value.trim(), societe=$('fs').value.trim(), status=$('fst').value;
+  const notes=$('fno').value.trim(), ca=parseFloat($('fca').value)||0;
+  if(!prenom&&!nom&&!email) return toast('⚠️ Remplissez au moins nom ou email','warning');
+  if(email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return toast('⚠️ Email invalide','warning');
+  if(ca<0) return toast('⚠️ CA ne peut pas être négatif','warning');
+  // FIX: user_id TOUJOURS défini et non modifiable
+  const c = {
+    prenom, nom,
+    email:     email  || null,
+    phone:     phone  || null,
+    societe:   societe|| null,
+    status, notes: notes || null,
+    ca_estime: ca,
+    user_id:   me.id,  // toujours l'utilisateur courant
+    tags:      null, // FIX: null → DEFAULT ARRAY[]::TEXT[] en base
+    source:    editId ? undefined : 'manuel',
+    updated_at:new Date().toISOString()
+  };
+  if(editId){ 
+    c.id = editId; 
+    delete c.source; // ne pas écraser la source existante
+  } else { 
+    c.id         = uuid(); 
+    c.created_at = new Date().toISOString(); 
+    c.source     = 'manuel';
+  }
+  
+  console.log('[SaveC] Contact à sauvegarder:', c.id, '| user_id:', c.user_id, '| online:', online);
+  
+  await idb.saveContact(c); 
+  mergeLocal(c);
+  
+  const cSafe = sanitizeContact(c, !editId); // PATCH: strip timestamps sur INSERT uniquement
+  if(online){
+    const { data, error } = await sb.from('contacts').upsert(cSafe).select().single();
+    if(error){ 
+      console.error('[SaveC] Erreur Supabase:', error.message, '| Code:', error.code);
+      await idb.addPending({t:'upsert_contact', d:cSafe}); 
+      toast('📱 Sauvegardé localement (erreur réseau)','warning'); 
+    } else { 
+      console.log('[SaveC] Supabase OK:', data?.id);
+      if(data){ mergeLocal(data); await idb.saveContact(data); } 
+      toast('✅ Contact sauvegardé !','success'); 
+    }
+  } else { 
+    await idb.addPending({t:'upsert_contact', d:c}); 
+    toast('📱 Hors-ligne — sync au retour réseau','warning'); 
+  }
+  
+  applyFilter(); 
+  if(curPg==='dash') renderDash(); 
+  if(curPg==='pipe') renderPipe();
+  await updatePendCount(); 
+  closeCModal();
+}
+function mergeLocal(c){ const i=contacts.findIndex(x=>x.id===c.id); if(i>=0) contacts[i]=c; else contacts.unshift(c); }
+
+async function deleteC(){
+  if(!editId||!isAdmin) return toast('❌ Suppression réservée à l\'Admin','error');
+  showConfirmModal('🗑️ Supprimer ce contact ?','Action irréversible.',async()=>{
+    await idb.deleteContact(editId); contacts=contacts.filter(x=>x.id!==editId);
+    if(online){ const {error}=await sb.from('contacts').delete().eq('id',editId); if(error) await idb.addPending({t:'delete_contact',id:editId}); }
+    else await idb.addPending({t:'delete_contact',id:editId});
+    applyFilter(); if(curPg==='dash') renderDash(); if(curPg==='pipe') renderPipe();
+    await updatePendCount(); toast('🗑️ Contact supprimé','success'); closeCModal();
+  });
+}
+
+// ── INTERACTIONS ──────────────────────────────
+function openIntModal(){ const d=new Date(); d.setDate(d.getDate()+7); $('ird').value=d.toISOString().split('T')[0]; $('in-notes').value=''; $('it').value='appel'; $('ir').value='positif'; showModal('m-int'); }
+function closeInt(){ closeModal('m-int'); }
+async function saveInt(){
+  if(!editId) return toast('⚠️ Aucun contact sélectionné','warning');
+  const int={id:uuid(),contact_id:editId,user_id:me.id,type:$('it').value,
+             result:$('ir').value,notes:$('in-notes').value.trim()||null,
+             rappel_date:$('ird').value||null,created_at:new Date().toISOString()};
+  await idb.saveInteraction(int);
+  if(online){ const {error}=await sb.from('interactions').insert(int); if(error) await idb.addPending({t:'insert_interaction',d:int}); }
+  else await idb.addPending({t:'insert_interaction',d:int});
+  if(int.result==='rappel'){
+    await sb.from('contacts').update({status:'rappel',updated_at:new Date().toISOString()}).eq('id',editId);
+    const c=contacts.find(x=>x.id===editId); if(c){c.status='rappel'; await idb.saveContact(c); applyFilter();}
+  }
+  await updatePendCount(); toast('✅ Interaction enregistrée !','success'); closeInt();
+}
+
+async function loadHistory(){
+  $('h-list').innerHTML=''; $('h-empty').style.display='none';
+  let rows=[];
+  if(online){
+    let q=sb.from('interactions').select('*, contacts(prenom,nom,societe)').order('created_at',{ascending:false}).limit(80);
+    if(!isAdmin) q=q.eq('user_id',me.id);
+    const {data,error}=await q; rows=error?await idb.getInteractions():(data||[]);
+  } else { rows=await idb.getInteractions(); if(!isAdmin) rows=rows.filter(r=>r.user_id===me.id); }
+  if(!rows.length){$('h-empty').style.display='block';return;}
+  const frag=document.createDocumentFragment();
+  rows.forEach((int,i)=>{
+    const c=int.contacts||{}; const d=document.createElement('div');
+    d.className='card'; d.style.cssText=`animation:pgIn .3s ${i*.04}s cubic-bezier(.16,1,.3,1) both`;
+    d.innerHTML=`
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div style="display:flex;align-items:center;gap:9px">
+          <span style="font-size:20px">${tEmoji(int.type)}</span>
+          <div><div class="ff" style="font-size:13.5px;font-weight:700">${esc(c.prenom||'')} ${esc(c.nom||'')}</div>${c.societe?`<div style="font-size:11.5px;color:var(--muted)">${esc(c.societe)}</div>`:''}</div>
+        </div>
+        <span class="badge ${rBadge(int.result)}">${esc(int.result)}</span>
+      </div>
+      ${int.notes?`<div style="font-size:12.5px;padding:10px;border-radius:10px;background:rgba(255,255,255,.04);color:#94a3b8;margin-bottom:7px">${esc(int.notes)}</div>`:''}
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:11.5px;color:var(--muted)">${fDate(int.created_at)}</span>
+        ${int.rappel_date?`<span style="font-size:11.5px;color:#fdba74">🔔 ${esc(int.rappel_date)}</span>`:''}
+        ${int.voip_duration?`<span class="badge b-voip">⏱ ${fSec(int.voip_duration)}</span>`:''}
+      </div>`;
+    frag.appendChild(d);
+  });
+  $('h-list').appendChild(frag);
+}
+
+// ── DASHBOARD ─────────────────────────────────
+function renderDash(){
+  const total=contacts.length, clients=contacts.filter(c=>c.status==='client').length;
+  const conv=total?Math.round(clients/total*100):0;
+  const ca=contacts.reduce((s,c)=>s+(Number(c.ca_estime)||0),0);
+  const rappels=contacts.filter(c=>c.status==='rappel');
+  $('k-total').textContent=total; $('k-cli').textContent=clients;
+  $('k-conv').textContent=conv+'%'; $('k-prog').style.width=conv+'%';
+  $('k-ca').textContent=ca>=1000?(ca/1000).toFixed(1)+'k€':ca+'€';
+  $('rappel-cnt').textContent=rappels.length;
+  const rl=$('rappels-list'); rl.innerHTML='';
+  rappels.slice(0,4).forEach(c=>{
+    const d=document.createElement('div');
+    d.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-radius:14px;cursor:pointer;background:rgba(249,115,22,.1);border:1px solid rgba(249,115,22,.2)';
+    d.innerHTML=`<div><div class="ff" style="font-size:13.5px;font-weight:700">${esc(c.prenom||'')} ${esc(c.nom||'')}</div><div style="font-size:12px;color:var(--muted)">${esc(c.societe||c.phone||'—')}</div></div><span style="font-size:22px">📞</span>`;
+    d.addEventListener('click',()=>openCModal(c)); rl.appendChild(d);
+  });
+  drawPipeChart(); drawActChart(); renderAISuggest();
+}
+function drawPipeChart(){
+  try {
+  const ctx=$('ch-pipe'); if(!ctx) return; 
+  if(charts.pipe){ charts.pipe.destroy(); charts.pipe=null; }
+  const ss=['lead','prospect','rappel','client','lost'];
+  const ls=['Lead','Prospect','À Rappeler','Client','Perdu'];
+  const cs=['#6366f1','#f59e0b','#f97316','#84cc16','#f43f5e'];
+  const vals=ss.map(s=>contacts.filter(c=>c.status===s).length);
+  if(!vals.some(v=>v>0)) return;
+  charts.pipe=new Chart(ctx,{type:'doughnut',
+    data:{labels:ls,datasets:[{data:vals,backgroundColor:cs.map(c=>c+'bb'),borderColor:cs,borderWidth:2}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'66%',
+      plugins:{legend:{position:'right',labels:{color:'#94a3b8',font:{size:11,family:'Plus Jakarta Sans'},boxWidth:11,padding:10}}}}});
+  } catch(e){ console.warn('[Chart] Pipeline render error:', e.message); }
+}
+function drawActChart(){
+  try {
+  const ctx=$('ch-act'); if(!ctx) return; 
+  if(charts.act){ charts.act.destroy(); charts.act=null; }
+  const days=[],vals=[];
+  for(let i=6;i>=0;i--){ const d=new Date(); d.setDate(d.getDate()-i); days.push(d.toLocaleDateString('fr',{weekday:'short'})); const ds=d.toISOString().split('T')[0]; vals.push(contacts.filter(c=>(c.created_at||'').startsWith(ds)||(c.updated_at||'').startsWith(ds)).length); }
+  charts.act=new Chart(ctx,{type:'bar',
+    data:{labels:days,datasets:[{label:'Activité',data:vals,backgroundColor:'rgba(99,102,241,.5)',borderColor:'#6366f1',borderWidth:2,borderRadius:8}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{x:{grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#64748b',font:{size:11}}},y:{grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#64748b',stepSize:1},beginAtZero:true}}}});
+  } catch(e){ console.warn('[Chart] Activité render error:', e.message); }
+}
+function renderAISuggest(){
+  const hot=contacts.filter(c=>c.status==='rappel'||c.status==='prospect').sort((a,b)=>new Date(b.updated_at||0)-new Date(a.updated_at||0))[0];
+  const el=$('ai-suggest');
+  if(!hot){el.textContent='✅ Tous vos prospects sont à jour !';return;}
+  el.innerHTML=`<div class="ff" style="font-size:14px;font-weight:700;color:#a5b4fc;margin-bottom:4px">🎯 ${esc(hot.prenom||'')} ${esc(hot.nom||'')} — ${esc(hot.societe||'Contact')}</div><div style="font-size:12px;color:var(--muted2);margin-bottom:8px">Statut : ${sLabel(hot.status)} · ${fDate(hot.updated_at)}</div><div style="font-size:13px;color:#c7d2fe">Relance prioritaire. Taux de conversion : <strong style="color:#bef264">+34%</strong></div><div style="display:flex;gap:8px;margin-top:10px">${hot.phone?`<a href="tel:${esc(hot.phone)}" class="btn btn-ghost btn-sm" style="flex:1;text-decoration:none">📞 Appeler</a>`:''}<button id="ai-open-btn" class="btn btn-ghost btn-sm" style="flex:1">👁️ Voir fiche</button></div>`;
+  const b=$('ai-open-btn'); if(b) b.addEventListener('click',()=>openCModal(hot));
+}
+
+// ── PIPELINE KANBAN ───────────────────────────
+function renderPipe(){
+  const board=$('pipe-board'); board.innerHTML='';
+  const stages=[{k:'lead',l:'🔵 Lead',c:'#6366f1'},{k:'prospect',l:'🟡 Prospect',c:'#f59e0b'},{k:'rappel',l:'🟠 À Rappeler',c:'#f97316'},{k:'client',l:'🟢 Client',c:'#84cc16'},{k:'lost',l:'🔴 Perdu',c:'#f43f5e'}];
+  stages.forEach(st=>{
+    const cs=contacts.filter(c=>c.status===st.k);
+    const col=document.createElement('div'); col.className='pipe-col';
+    const hdr=document.createElement('div');
+    hdr.style.cssText=`display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:14px;margin-bottom:10px;background:${st.c}18;border:1px solid ${st.c}35`;
+    hdr.innerHTML=`<span class="ff" style="font-size:13px;font-weight:800">${st.l}</span><span class="badge" style="background:${st.c}28;color:${st.c};border:1px solid ${st.c}45">${Number(cs.length)}</span>`;
+    col.appendChild(hdr);
+    const zone=document.createElement('div');
+    zone.className='pipe-drop-zone'; zone.dataset.status=st.k;
+    zone.style.cssText='min-height:120px;border-radius:14px;border:2px solid transparent;padding:2px;transition:all .18s';
+    zone.addEventListener('dragover',e=>{e.preventDefault();zone.classList.add('drag-over');});
+    zone.addEventListener('dragleave',()=>zone.classList.remove('drag-over'));
+    zone.addEventListener('drop',async e=>{e.preventDefault();zone.classList.remove('drag-over');if(draggedContact&&draggedContact.status!==st.k) await updateContactStatus(draggedContact.id,st.k);});
+    zone.addEventListener('touchend',async()=>{if(draggedContact&&draggedContact.status!==st.k){await updateContactStatus(draggedContact.id,st.k);draggedContact=null;}});
+    cs.forEach(c=>{
+      const card=document.createElement('div'); card.className='pipe-card'; card.draggable=true;
+      card.innerHTML=`<div class="ff" style="font-size:13px;font-weight:700;margin-bottom:3px">${esc(c.prenom||'')} ${esc(c.nom||'')}</div><div style="font-size:11.5px;color:var(--muted)">${esc(c.societe||'—')}</div>${c.ca_estime?`<div style="font-size:11px;color:#bef264;margin-top:4px">💰 ${fN(c.ca_estime)}€</div>`:''}`;
+      card.addEventListener('dragstart',e=>{draggedContact=c;card.classList.add('dragging');e.dataTransfer.effectAllowed='move';});
+      card.addEventListener('dragend',()=>{card.classList.remove('dragging');});
+      let touchT=null;
+      card.addEventListener('touchstart',()=>{touchT=setTimeout(()=>{draggedContact=c;toast(`✋ ${c.prenom||c.nom||'Contact'} sélectionné — touchez une colonne`,'info');},600);});
+      card.addEventListener('touchend',()=>clearTimeout(touchT));
+      card.addEventListener('click',()=>openCModal(c));
+      zone.appendChild(card);
+    });
+    if(!cs.length){const e=document.createElement('div');e.style.cssText='text-align:center;padding:24px;font-size:12px;color:var(--muted)';e.textContent='Aucun contact';zone.appendChild(e);}
+    col.appendChild(zone); board.appendChild(col);
+  });
+}
+async function updateContactStatus(id,newStatus){
+  const c=contacts.find(x=>x.id===id); if(!c) return;
+  c.status=newStatus; c.updated_at=new Date().toISOString();
+  await idb.saveContact(c);
+  if(online){ 
+    const {error}=await sb.from('contacts').update({status:newStatus,updated_at:c.updated_at}).eq('id',id); 
+    if(error) await idb.addPending({t:'upsert_contact',d:sanitizeContact(c, false)}); 
+  }
+  else await idb.addPending({t:'upsert_contact',d:sanitizeContact(c, false)});
+  applyFilter(); renderPipe(); if(curPg==='dash') renderDash();
+  toast(`✅ Déplacé vers ${sLabel(newStatus)}`,'success');
+}
+
+// ── AI MODULE ─────────────────────────────────
+function fillAiSel(){
+  const sel=$('ai-sel'); sel.innerHTML='<option value="">-- Choisir --</option>';
+  contacts.forEach(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=`${c.prenom||''} ${c.nom||''} — ${c.societe||c.email||''}`.trim();sel.appendChild(o);});
+}
+function renderHot(){
+  const hot=contacts.filter(c=>c.status==='rappel'||c.status==='prospect').sort((a,b)=>new Date(b.upda
